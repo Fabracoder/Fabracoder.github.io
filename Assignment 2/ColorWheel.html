@@ -1,0 +1,129 @@
+<DOCTYPE html> 
+<html> 
+<body >  
+    <canvas id="myCanvas2" width="1000" height="1000">Your browser does not support the HTML5 canvas tag.</canvas>
+    
+     <script src="MyLibrary.js"> </script>
+     <script>
+         
+         
+        var scaleing = 20;
+        var canvas = document.getElementById('myCanvas2');
+        var context = canvas.getContext('2d');
+        var centerX = canvas.width / 2;
+        var centerY = canvas.height / 2;
+        var radius = canvas.width/scaleing/2;
+        var layers = 5;
+        var colorStep = 51; // amount shade shifts by
+        var r = 255;
+        var g = 255;
+        var b = 255; 
+        var color = 'rgb(' + r +', ' + g + ',' + b +')';
+        var debug = 0; 
+        var i,j,k;
+
+         // draws the hexagon in black
+        setColor(0, 0, 0);
+        fillRegularPolygon(context, centerX, centerY, radius * 2 * layers, 6, -Math.PI/2, color);
+         // draws the center circle in white
+        setColor(255, 255, 255);
+        fillCircle(context,radius, color, centerX,centerY);
+         
+        context.save();
+         var side;
+         var count;
+         for( i=0;i<6;i++) // the 3 primary shades
+         {
+//             0blue 2red 4green 
+             r=255;
+             g=255;
+             b=255;
+             
+             context.save()
+             if(i%2==1)//undo to 1
+             {
+                 for(j=0;j<6;j++)
+                 {
+                     context.save();                     
+                         if(i==3)
+                         {
+                             g= 255-colorStep*j; 
+                             b= 255-colorStep*j; 
+                         }
+                         if(i==5)
+                         {
+                             r= 255-colorStep*j; 
+                             b= 255-colorStep*j; 
+                         }
+                         if(i==1)
+                         {
+                             g= 255-colorStep*j; 
+                             r= 255-colorStep*j; 
+                         }
+
+                         setColor(r,g,b);
+                         addPolarDirection(context,radius*2*j,6,i); // adds each layer
+                         fillCircle(context,radius, color, centerX,centerY); 
+ 
+                         if(i==3)
+                         {
+                             context.save(); 
+                                context.translate(centerX,centerY); 
+                                recurseR(context,j-1,r,g,b);
+                             context.restore();
+                         } 
+                     
+                         if(i==5)
+                         { 
+                             context.save(); 
+                                context.translate(centerX,centerY); 
+                                recurseG(context,j-1,r,g,b);
+                             context.restore();
+                         } 
+                         if(i==1)
+                         { 
+                             context.save(); 
+                                context.translate(centerX,centerY); 
+                                recurseB(context,j-1,r,g,b);
+                             context.restore();
+                         } 
+
+                     context.restore();
+                 }
+                 
+             context.restore();
+             }
+             else
+             {
+                 context.save();
+                 for(j=0;j<6;j++)
+                 {
+                 context.save();
+                    if(i==0)
+                     {
+                         r= 255-colorStep*j;  
+                     }
+                     if(i==2)
+                     {
+                         g= 255-colorStep*j;  
+                     }
+                     if(i==4)
+                     { 
+                         b= 255-colorStep*j; 
+                     }
+
+                         setColor(r,g,b);
+                         addPolarDirection(context,radius*2*j,6,i); // adds each layer
+                         fillCircle(context,radius, color, centerX,centerY); 
+                     
+             context.restore();
+                 }
+             context.restore();
+             }
+         }
+  
+    </script>
+  </body>
+</html>      
+</body> 
+</html>

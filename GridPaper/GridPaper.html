@@ -1,0 +1,39 @@
+<html> 
+    <head></head>
+<body>  
+    <canvas id="myCanvas" width="1000" height="1000">Your browser does not support the HTML5 canvas tag.</canvas>
+    
+    <script  src="MyLibrary.js">
+        
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        context.moveTo(100,200);
+        context.lineTo(200,300);
+        context.stroke();
+        
+        
+//   
+//        var units = 100;
+//        var temp =0;
+//         
+//        context.strokeStyle = "black";
+//        context.fillStyle = "blue";
+//        context.fillRect(10,10,30,40);
+//         
+//        context.beginPath();
+//        context.moveTo(200,0);
+//        context.lineTo(300,canvas.height); 
+//        context.stroke();  
+//         
+//         for ( temp := 0; temp < canvas.height; temp += units )
+//         {
+//             context.beginPath();
+//             context.moveTo(temp*units,0);
+//             context.lineTo(temp*units,canvas.height); 
+//             context.stroke();  
+//         }
+//        
+            </script>
+  </body>
+</html>      
+ 
