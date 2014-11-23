@@ -1,32 +1,30 @@
 <DOCTYPE html> 
 <html> 
-<body >  
+<body>  
     <canvas id="myCanvas2" width="1000" height="1000">Your browser does not support the HTML5 canvas tag.</canvas>
     
      <script src="MyLibrary.js"> </script>
      <script>
-         
-         
-        var scaleing = 20;
+        var scaleing = 25;
         var canvas = document.getElementById('myCanvas2');
         var context = canvas.getContext('2d');
         var centerX = canvas.width / 2;
         var centerY = canvas.height / 2;
         var radius = canvas.width/scaleing/2;
         var layers = 5;
-        var colorStep = 51; // amount shade shifts by
-        var r = 255;
-        var g = 255;
-        var b = 255; 
+        var colorStep = 42; // amount shade shifts by
+        var r = 256;
+        var g = 256;
+        var b = 256; 
         var color = 'rgb(' + r +', ' + g + ',' + b +')';
-        var debug = 0; 
+        var debug =0; 
         var i,j,k;
 
          // draws the hexagon in black
         setColor(0, 0, 0);
         fillRegularPolygon(context, centerX, centerY, radius * 2 * layers, 6, -Math.PI/2, color);
          // draws the center circle in white
-        setColor(255, 255, 255);
+        setColor(256, 256, 256);
         fillCircle(context,radius, color, centerX,centerY);
          
         context.save();
@@ -35,9 +33,9 @@
          for( i=0;i<6;i++) // the 3 primary shades
          {
 //             0blue 2red 4green 
-             r=255;
-             g=255;
-             b=255;
+             r=256;
+             g=256;
+             b=256;
              
              context.save()
              if(i%2==1)//undo to 1
@@ -47,18 +45,18 @@
                      context.save();                     
                          if(i==3)
                          {
-                             g= 255-colorStep*j; 
-                             b= 255-colorStep*j; 
+                             g= 256-colorStep*j; 
+                             b= 256-colorStep*j; 
                          }
                          if(i==5)
                          {
-                             r= 255-colorStep*j; 
-                             b= 255-colorStep*j; 
+                             r= 256-colorStep*j; 
+                             b= 256-colorStep*j; 
                          }
                          if(i==1)
                          {
-                             g= 255-colorStep*j; 
-                             r= 255-colorStep*j; 
+                             g= 256-colorStep*j; 
+                             r= 256-colorStep*j; 
                          }
 
                          setColor(r,g,b);
@@ -101,15 +99,15 @@
                  context.save();
                     if(i==0)
                      {
-                         r= 255-colorStep*j;  
+                         r= 256-colorStep*j;  
                      }
                      if(i==2)
                      {
-                         g= 255-colorStep*j;  
+                         g= 256-colorStep*j;  
                      }
                      if(i==4)
                      { 
-                         b= 255-colorStep*j; 
+                         b= 256-colorStep*j; 
                      }
 
                          setColor(r,g,b);

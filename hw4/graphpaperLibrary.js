@@ -2,7 +2,7 @@ var firstPoint = undefined,
     secondPoint = undefined; 
 var color = "";
 var menuOption = 0;
-var activeShape = -1; 
+ 
 // Initializes the top canvas for color selection
 function initializeMenu() {
     var pos = 0;
@@ -25,19 +25,6 @@ function initializeMenu() {
     conMenu.fillRect(pos, 0,  50, 50);
     
     pos += 60; 
-    
-    conMenu.fillStyle = "white";
-    conMenu.fillRect(pos, 0,  50, 50);
-    showMessage1("Undo", pos, 15  , 30, 30, conMenu);
-    
-    pos += 60; 
-    
-    conMenu.fillStyle = "white";
-    conMenu.fillRect(pos, 0,  50, 50);
-    showMessage1("Reset", pos, 15  , 30, 30, conMenu);
-    
-    pos += 60; 
-    
 }
 
 setDefaultShapeColor(12, 111, 111, 0.2);
@@ -67,18 +54,6 @@ function select(event) {
         setDefaultShapeColor(255, 255, 1);
         break;
             
-    case 4:
-        setDefaultShapeColor(1, 1, 1);
-        RectangleArray.pop();    
-        refreshCanvas();
-        break;
-
-    case 5:
-        setDefaultShapeColor(1, 1, 1);
-        RectangleArray = [];    
-        refreshCanvas();
-        break;
-            
     default:
         setDefaultShapeColor();
             
@@ -88,7 +63,7 @@ function select(event) {
 }
 
 initializeMenu();
-updateCanvasSize();
+
 // Your graphpaper function,  modified to produce darker lines at intervals
 function drawGraphPaper(units, color) { 
   units = units || 20;  
@@ -149,55 +124,24 @@ function drawUIBox(x, y, width, height) {
   context.fillRect(x, y, width, height);
   context.restore();
 }
-function showMessage1(string, x, y, width, height, cnxt) {
-
-    cnxt = cnxt || context;
-    xVal = x || 10;
-    yVal = y || canvas.height-25;
-    w = width || 100;
-    h = height || 20; 
-    
-    var box = {
-        x: xVal ,
-        y: yVal,
-        width: w,
-        height: h}; // changed to always be at the bottom of the canvas instead of absole location
-  
-  cnxt.save();
-  
-  // draw the box exterior
-  if (!showMessage.boxDrawn) {
-//    drawUIBox(box.x, box.y, box.width, box.height);
-    showMessage.boxDrawn = true; // prevent redraw of the box
-  }
-  
-  // draw the box contents
-  cnxt.fillStyle = "white";
-  cnxt.fillRect(box.x, box.y, box.width, box.height);
-  cnxt.fillStyle = "black";
-  cnxt.font = "14px Times New Roman";
-  cnxt.fillText(string, box.x + 7, box.y+ 15);
-  cnxt.restore();
-}
-
   
 function showMessage(string) {
 
-  var box = {x: 10, y: canvas.height-25, width: 180, height: 20};
-
+  var box = {x: 10, y: canvas.height-25 , width: 180, height: 20}; // changed to always be at the bottom of the canvas instead of absole location
+  
   context.save();
-
+  
   // draw the box exterior
   if (!showMessage.boxDrawn) {
     drawUIBox(box.x, box.y, box.width, box.height);
     showMessage.boxDrawn = true; // prevent redraw of the box
   }
-
+  
   // draw the box contents
   context.fillStyle = "white";
   context.fillRect(box.x, box.y, box.width, box.height);
   context.fillStyle = "black";
-  context.font = "14px Arial";
+  context.font = "14px Times New Roman";
   context.fillText(string, box.x + 7, box.y+ 15);
   context.restore();
 }
@@ -206,7 +150,7 @@ function showMessage(string) {
 showMessage("Selection menu on top ");
  
 function showCoordinates(x, y) {
-  var coordinateString =  "  Color: "+context.fillStyle +"   Mouse location: (" + x + ", " + y + ")" ;
+  var coordinateString = "Mouse location: (" + x + ", " + y + ")"+ "  Color: "+context.fillStyle;
   showMessage(coordinateString);
 }
   
@@ -240,19 +184,19 @@ function mouseMove(event) {
                   y:dY,
                 width: x -  dX,
                 height: y - dY,
-                }; 
-      drawRectShape(rect.x, rect.y, rect.width, rect.height); 
+                };
+        
+      drawRectShape(rect.x, rect.y, rect.width, rect.height);
+        
     }
  };
  
 function mouseDown(event) {
-   
+    
+  isDown = true;  
   dX = event.clientX - canvas.offsetLeft, // saves mouse down location
   dY = event.clientY - canvas.offsetTop;
-  // check if it is in a rectagle
- 
     
-  isDown = true;        
   showCoordinates(dX, dY);
 };
 
@@ -266,32 +210,19 @@ function mouseUp(event) {
   context.fillStyle=color;
     
   var rect = { x:dX, // create the rectangle with type and color
-               y:dY,
-               width: x -  dX,
-               height: y - dY,
-               type: 1,
-//               ctx: context;
-               color: context.fillStyle }; 
-      drawRectShape(rect.x, rect.y, rect.width, rect.height);
+             y:dY,
+             width: x -  dX,
+             height: y - dY,
+             type: 1,
+             color: context.fillStyle }; 
+      drawRectShape(rect.x, rect.y, rect.width, rect.height );
       RectangleArray.push(rect); // saves it to the list of rectangles refresh draws
       showCoordinates(x, y);
-      console.log(  " " + context.fillStyle);
+      console.log(val + " " + context.fillStyle);
 };
 
-function updateCanvasSize()
-{
-    var temp = window.innerWidth - 60;
-    if( temp < 60 * 6)
-    {
-        temp = 60 * 6;
-    }
-  context.canvas.width  = temp;
-  context.canvas.height = window.innerHeight -120;  
-  refreshCanvas();
-}
-
 function refreshCanvas() // redraws the screen with everything that is 'permenant'
-{ 
+{
  context.clearRect(0, 0, canvas.width, canvas.height);
     if(isDown)
     {
@@ -299,8 +230,7 @@ function refreshCanvas() // redraws the screen with everything that is 'permenan
     }
     else
         drawGraphPaper(5,"rgba(10,10,255,0.03)");
-
-    if(RectangleArray)
+    
     for(var i =0; i< RectangleArray.length;i++)
     {
         if(RectangleArray[i].type == 1)
