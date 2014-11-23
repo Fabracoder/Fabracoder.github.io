@@ -1,0 +1,88 @@
+<DOCTYPE html> 
+<html> 
+<body >  
+    <canvas id="myCanvas" width="1000" height="1000">Your browser does not support the HTML5 canvas tag.</canvas>
+    
+     <script  src = "MyLibraryHW3.js" > </script>
+     <script>
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+    
+        // defining points for all lines and curves
+        var pt1 = new Point(100, 100, "pt1");  
+        var pt2 = new Point(300, 87, "pt2"); 
+        var pt3 = new Point(100, 210, "pt3"); 
+        var pt4 = new Point(350, 330, "pt4"); 
+        var pt5 = new Point(250, 190, "pt5"); 
+        var pt6 = new Point(610, 240, "pt6"); 
+        var pt7 = new Point(450, 90, "pt7");
+        var pt8  = new Point(550, 530, "pt8"); 
+        var pt9  = new Point(550, 290, "pt9"); 
+        var pt10 = new Point(310, 440, "pt10"); 
+        var pt11 = new Point(550, 590, "pt11");
+        var b1 = new Point(830, 100, "5ptCurve pt1");
+        var b2 = new Point(700, 270, "5ptCurve pt2");
+        var b3 = new Point(950, 300, "5ptCurve pt3");
+        var b4 = new Point(700, 330, "5ptCurve pt4");
+        var b5 = new Point(880, 500, "5ptCurve pt5");
+        // drawing all labeled points 
+        pt1.draw();
+        pt2.draw();
+        pt3.draw();
+        pt4.draw();
+        pt5.draw();
+        pt6.draw();
+        pt7.draw();
+        pt8.draw();
+        pt9.draw();
+        pt10.draw();
+        pt11.draw();
+        b1.draw();
+        b2.draw();
+        b3.draw();
+        b4.draw();
+        b5.draw();
+         
+         // creating and drawing a line, then showing interpolation by drawing the points
+         var aLine = new Line(pt1,pt2);  
+         aLine.draw();
+         aLine.dotted(10);
+         
+         // creating and drawing a dashed line ( small issue with even number steps )
+         var bLine = new Line(pt3,pt4);  
+         context.strokeStyle = "green";   
+         context.lineWidth = 3  ;
+         bLine.dashed(11); 
+         bLine.dotted(11);
+         
+         // creating and drawing a quadratic bezier curve, then showing interpolation by drawing the points
+         var aQuadline = new Quadratic(pt5, pt6, pt7); 
+         aQuadline.draw();
+         aQuadline.dotted(10);
+         
+         // lines to show the bounding lines
+         var tempLine = (new Line(pt5,pt6)) ;
+         tempLine.draw();
+         tempLine = (new Line(pt6,pt7)) ;
+         tempLine.draw();
+         
+         // creating and drawing a cubic bezier curve, then showing interpolation by drawing the points
+         aCubic = new Cubic(pt8, pt9, pt10, pt11); 
+         aCubic.draw();
+         aCubic.dotted(10); 
+         
+         // lines to show the bounding lines
+         context.strokeStyle = "blue";
+         tempLine = new Line(pt8,pt9);
+         tempLine.draw();
+         tempLine = new Line(pt9,pt10);
+         tempLine.draw();
+         tempLine = new Line(pt10,pt11);
+         tempLine.draw();
+       
+         var testBP5 = new b5p(b1,b2,b3,b4,b5);
+         testBP5.dotted(100); 
+    </script>
+  </body>
+</html>      
+ 
