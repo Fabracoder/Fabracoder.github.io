@@ -1,3 +1,5 @@
+// Author : Oliver Seet (Fabracoder)
+// fall 2014
 function fillCircle(context, radius, color, currentX, currentY) {
     "use strict";
     context.beginPath();
@@ -7,7 +9,7 @@ function fillCircle(context, radius, color, currentX, currentY) {
     context.closePath();
     assert(debug,"circle");
 }
- 
+
 function setCoordinatesSytem(context, centerX, centerY) {
     "use strict";
     context.translate(centerX, centerY);
@@ -34,12 +36,12 @@ function fillRegularPolygon(ctx, currentX, currentY, radius, sides, startAngle, 
     }
 
     var i, a = -(Math.PI * 2) / sides;
-    
+
     ctx.beginPath();
     ctx.save();
     ctx.translate(currentX, currentY);
     ctx.rotate(startAngle);
-    
+
     for (i = 1; i <= sides; i = i + 1) {
         ctx.lineTo(radius * Math.cos(a * i), radius * Math.sin(a * i));
     }
@@ -69,7 +71,7 @@ function recurseR(context,iteration,r,g,b)
     context.save();
     recurseRW(context,iteration,r,g,b);
     context.restore();
-    
+
 }
 function recurseRD(context,iteration, r, g, b) {
     if(iteration<0)
@@ -86,7 +88,7 @@ function recurseRD(context,iteration, r, g, b) {
 function recurseRW(context,iteration, r, g, b) {
     if(iteration<0) {
         return;
-    } 
+    }
      g+=colorStep;
      setColor(r,g,b);
      addPolarDirection(context,radius*2,6,5);
@@ -99,14 +101,14 @@ function recurseRW(context,iteration, r, g, b) {
 
 function recurseG(context,iteration,r,g,b)
 {
-  
+
     context.save();
     recurseGD(context,iteration,r,g,b);
     context.restore();
     context.save();
     recurseGW(context,iteration,r,g,b);
     context.restore();
-    
+
 }
 function recurseGD(context,iteration, r, g, b) {
     if(iteration<0)
@@ -123,7 +125,7 @@ function recurseGD(context,iteration, r, g, b) {
 function recurseGW(context,iteration, r, g, b) {
     if(iteration<0) {
         return;
-    } 
+    }
      r+=colorStep;
      setColor(r,g,b);
      addPolarDirection(context,radius*2,6,3);
@@ -134,14 +136,14 @@ function recurseGW(context,iteration, r, g, b) {
 
 function recurseB(context,iteration,r,g,b)
 {
-  
+
     context.save();
     recurseBD(context,iteration,r,g,b);
     context.restore();
     context.save();
     recurseBW(context,iteration,r,g,b);
     context.restore();
-    
+
 }
 function recurseBD(context,iteration, r, g, b) {
     if(iteration<0)
@@ -158,7 +160,7 @@ function recurseBD(context,iteration, r, g, b) {
 function recurseBW(context,iteration, r, g, b) {
     if(iteration<0) {
         return;
-    } 
+    }
      r+=colorStep;
      setColor(r,g,b);
      addPolarDirection(context,radius*2,6,3);

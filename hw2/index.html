@@ -1,11 +1,11 @@
-<DOCTYPE html> 
-<html> 
-<body>  
-    <canvas id="myCanvas2" width="1000" height="1000">Your browser does not support the HTML5 canvas tag.</canvas>
-    
+<DOCTYPE html>
+<html>
+<body>
+    <canvas id="myCanvas2" width="600" height="600">Your browser does not support the HTML5 canvas tag.</canvas>
+
      <script src="MyLibrary.js"> </script>
      <script>
-        var scaleing = 25;
+        var scaleing = 12;
         var canvas = document.getElementById('myCanvas2');
         var context = canvas.getContext('2d');
         var centerX = canvas.width / 2;
@@ -15,9 +15,9 @@
         var colorStep = 42; // amount shade shifts by
         var r = 256;
         var g = 256;
-        var b = 256; 
+        var b = 256;
         var color = 'rgb(' + r +', ' + g + ',' + b +')';
-        var debug =0; 
+        var debug =0;
         var i,j,k;
 
          // draws the hexagon in black
@@ -26,69 +26,69 @@
          // draws the center circle in white
         setColor(256, 256, 256);
         fillCircle(context,radius, color, centerX,centerY);
-         
+
         context.save();
          var side;
          var count;
          for( i=0;i<6;i++) // the 3 primary shades
          {
-//             0blue 2red 4green 
+//             0blue 2red 4green
              r=256;
              g=256;
              b=256;
-             
+
              context.save()
              if(i%2==1)//undo to 1
              {
                  for(j=0;j<6;j++)
                  {
-                     context.save();                     
+                     context.save();
                          if(i==3)
                          {
-                             g= 256-colorStep*j; 
-                             b= 256-colorStep*j; 
+                             g= 256-colorStep*j;
+                             b= 256-colorStep*j;
                          }
                          if(i==5)
                          {
-                             r= 256-colorStep*j; 
-                             b= 256-colorStep*j; 
+                             r= 256-colorStep*j;
+                             b= 256-colorStep*j;
                          }
                          if(i==1)
                          {
-                             g= 256-colorStep*j; 
-                             r= 256-colorStep*j; 
+                             g= 256-colorStep*j;
+                             r= 256-colorStep*j;
                          }
 
                          setColor(r,g,b);
                          addPolarDirection(context,radius*2*j,6,i); // adds each layer
-                         fillCircle(context,radius, color, centerX,centerY); 
- 
+                         fillCircle(context,radius, color, centerX,centerY);
+
                          if(i==3)
                          {
-                             context.save(); 
-                                context.translate(centerX,centerY); 
+                             context.save();
+                                context.translate(centerX,centerY);
                                 recurseR(context,j-1,r,g,b);
                              context.restore();
-                         } 
-                     
+                         }
+
                          if(i==5)
-                         { 
-                             context.save(); 
-                                context.translate(centerX,centerY); 
+                         {
+                             context.save();
+                                context.translate(centerX,centerY);
                                 recurseG(context,j-1,r,g,b);
                              context.restore();
-                         } 
+                         }
                          if(i==1)
-                         { 
-                             context.save(); 
-                                context.translate(centerX,centerY); 
+                         {
+                             context.save();
+                                context.translate(centerX,centerY);
                                 recurseB(context,j-1,r,g,b);
                              context.restore();
-                         } 
+                         }
 
                      context.restore();
                  }
-                 
+
              context.restore();
              }
              else
@@ -99,29 +99,29 @@
                  context.save();
                     if(i==0)
                      {
-                         r= 256-colorStep*j;  
+                         r= 256-colorStep*j;
                      }
                      if(i==2)
                      {
-                         g= 256-colorStep*j;  
+                         g= 256-colorStep*j;
                      }
                      if(i==4)
-                     { 
-                         b= 256-colorStep*j; 
+                     {
+                         b= 256-colorStep*j;
                      }
 
                          setColor(r,g,b);
                          addPolarDirection(context,radius*2*j,6,i); // adds each layer
-                         fillCircle(context,radius, color, centerX,centerY); 
-                     
+                         fillCircle(context,radius, color, centerX,centerY);
+
              context.restore();
                  }
              context.restore();
              }
          }
-  
+
     </script>
   </body>
-</html>      
-</body> 
+</html>
+</body>
 </html>
