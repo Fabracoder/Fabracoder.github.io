@@ -141,10 +141,10 @@ var materialQ = new THREE.MeshPhongMaterial({
      
    createRulerGrid();  
      // add random buildings
-  createRoadWithBuildings(10000,1000,new THREE.Vector3(0,floorHeight,0));
+  createRoadWithBuildings(10000,1000,new THREE.Vector3(0,floorHeight/2,0));
 
  
-     for (i = 0, j=0; i < 200; i++) {
+     for (i = 0, j=0; i < 2000; i++) {
          var x = Math.floor(Math.random()*1000+100);
          var y = Math.floor(Math.random()*1000+10);
          var z = Math.floor(Math.random()*1000+100);
@@ -411,7 +411,7 @@ function createRulerGrid()
             roadmesh.position.x = startPos.x;
         roadmesh.position.y = startPos.y;
         roadmesh.position.z = startPos.z-roadLength/2;
-        makeBuilding(new THREE.Vector3(roadWidth/2+bwidth/2,floorHeight,z-tblength),new THREE.Vector3(bwidth,bheight,blength));
+        makeBuilding(new THREE.Vector3(roadWidth/2+bwidth/2,startPos.y,z-tblength),new THREE.Vector3(bwidth,bheight,blength));
         } 
     }
     tblength=0;
@@ -426,7 +426,7 @@ function createRulerGrid()
             roadmesh.position.x = startPos.x;
         roadmesh.position.y = startPos.y;
         roadmesh.position.z = startPos.z-roadLength/2;
-        makeBuilding(new THREE.Vector3(-roadWidth/2-bwidth/2,floorHeight,z-tblength),new THREE.Vector3(bwidth,bheight,blength));
+        makeBuilding(new THREE.Vector3(-roadWidth/2-bwidth/2,startPos.y,z-tblength),new THREE.Vector3(bwidth,bheight,blength));
         } 
     }    
      scene.add(roadmesh);
