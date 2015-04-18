@@ -72,8 +72,8 @@ var materialQ = new THREE.MeshPhongMaterial({
      //     LightingInit();
      dirLight = new THREE.DirectionalLight(0x999999);
      dirLight.position.set(0, 1, 1).normalize();
-     dirLight.castShadow = true;
-     dirLight.shadowDarkness = 0.4;
+//     dirLight.castShadow = true;
+//     dirLight.shadowDarkness = 0.4;
      scene.add(dirLight);
 
      ambientLight = new THREE.AmbientLight(0x515151);
@@ -239,8 +239,8 @@ var materialQ = new THREE.MeshPhongMaterial({
      renderer = new THREE.WebGLRenderer();
      renderer.setPixelRatio(window.devicePixelRatio);
      renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-     renderer.shadowMapEnabled = true;
-     renderer.shadowMapType = THREE.PCFSoftShadowMap;
+//     renderer.shadowMapEnabled = true;
+//     renderer.shadowMapType = THREE.PCFSoftShadowMap;
      renderer.render(scene, camera);
      container.appendChild(renderer.domElement);
 
@@ -353,8 +353,8 @@ function createRulerGrid()
     positions[1]=0;
     positions[2]=0;
     positions[4]=10;
-    positions[5]=110;
-    positions[6]=110;
+    positions[5]=100;
+    positions[6]=100;
     
     colors[0]=30;
     colors[1]=210;
