@@ -55,7 +55,7 @@ var materialQ = new THREE.MeshPhongMaterial({
 
      camera = new THREE.PerspectiveCamera(25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7);
      camera.position.z = 1000 * 5;
-     camera.position.y = floorHeight * 5;
+     camera.position.y = floorHeight * 2;
 
      //     SceneInit();
      scene = new THREE.Scene();
@@ -92,6 +92,11 @@ var materialQ = new THREE.MeshPhongMaterial({
 		cube_mesh.position.x = -2000;
         cube_mesh.position.y = 600;
 		var cube_bsp = new ThreeBSP( cube_mesh );
+    
+        cube_mesh.position.x = -3500;
+        cube_mesh.position.y = 600;
+	 
+        var cube_bsp2 = new ThreeBSP( cube_mesh );
 
 		var cubegeometry = new THREE.BoxGeometry( 900, 900, 1000 );
 		var cubemesh = new THREE.Mesh( cubegeometry );
@@ -105,9 +110,20 @@ var materialQ = new THREE.MeshPhongMaterial({
 		var sphere_mesh = new THREE.Mesh( sphere_geometry );
 		sphere_mesh.position.x = -1500;
 		sphere_mesh.position.y = 300;
-		sphere_mesh.position.z = -450;
-     
+		sphere_mesh.position.z = -450;     
 		var sphere_bsp = new ThreeBSP( sphere_mesh );
+     
+        var sphere_geometry2 = new THREE.SphereGeometry( 660, 16, 32 );
+		var sphere_mesh2 = new THREE.Mesh( sphere_geometry2 );
+		sphere_mesh2.position.x = -3500;
+		sphere_mesh2.position.y = 500;
+		sphere_mesh2.position.z = 0;     
+		var sphere_bsp2 = new ThreeBSP( sphere_mesh2 );
+     
+		var subtract_bsp = cube_bsp2.subtract( sphere_bsp2 );
+		var result = subtract_bsp.toMesh(materialQ );
+		result.geometry.computeVertexNormals();     
+     		scene.add( result );
 //        scene.add(sphere_mesh);
 		var subtract_bsp = cube_bsp.subtract( sphere_bsp );
 		var result = subtract_bsp.toMesh(materialQ );
@@ -249,7 +265,7 @@ var materialQ = new THREE.MeshPhongMaterial({
      camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
      camera.updateProjectionMatrix();
 
-     composer.reset();
+//     composer.reset();
 
  };
 
