@@ -1,0 +1,236 @@
+SPRING 2015 STUDENT EXPO 
+MAY 8th = friday 9:00 - 12:00 noon  
+
+
+I should take a multi agent approach to this.
+begin with  
+    building agent?
+    road agent
+cross referance with perlin/simplex noise generation for constancy
+
+scale = 1 : 1 foot
+
+
+
+
+CS116b Final Project Notes and Thoughts
+
+Randomly place some lvl 1 buildings ( small chance for a lvl 2 building ) in clear areas every simulated year (1-20 per year) 
+ ( nearby water increases probability )
+ ( plant dense region increases probability )
+
+ if Age of building = (Random.next()*8 + 2)  then create path to  Random.next()*(6^(1+log(total of building values in 100 miles^2 )) closest building 
+          If existing road is closer, connect to that road and upgrade road path +1 lvl overlap after Random.next()*5 years.
+
+  Roads have a high probability for new buildings to be built near them ( the higher the level road the higher the likelihood as well as closer to the road )
+
+  Buildings 'on' a road ( connected to it without a new path ) increase that road's 'traffic' by the building's population/2
+     traffic determines width of road pressure (how wide the road wants to be if it is allowed to expand)
+     width of road =  log(traffic)+1
+     
+   if road width pressure increases and it can not relieve pressure through upgrading due to existing structures and there is a large section of low level buildings ( 1/2 * road pressure excess ) then it will demolish those buildings and expand the road's width. Buildings have a chance the be saved and routed around ( the higher the level the higher the chance ) 
+
+ //   Dirt paths and gravel paths are highly sensitive to terrain resistance cost 
+
+   legend:
+          grade = the change in elevation
+Terrain cost  
+     
+     dirt/gravel 
+          0 + ((grade)^2)*10 
+
+     grass /  brush
+          0+ log(underbrush thickness level) + ((grade)^2)*10
+
+     rocky ground
+          1+ log(rock size variation level) + ((grade)^2)*10 
+ 
+     forest/jungle
+          1+ log(forest density)^2 + ((grade)^2)*10 
+   
+     water : creek/river
+          2 + depth*width
+     
+1 mile = 1056 units lengths ( a unit length is 5 feet )
+          
+  Human Paths   :: all have a max width of 12
+     lvl1 Dirt Path  
+          find lowest value path 
+     lvl2 Sand/Gravel Path 
+          find lowest value path , ignore values less than 10
+     lvl3 Stone paved (Cobblestone) + width   ( 40% chance to pick 2nd most optimal path )
+          find lowest value path , ignore values less than 10
+          it is allowed removal of 1 terrain value (less than 100 ) per mile of length
+          
+     lvl4 Brick paved   // can tunnel
+          find lowest value path , ignore values less than 20
+          it is allowed removal of 10 terrain value (less than 200 ) per mile of length
+           
+     Asphalt paved ( mid/low initial cost, mid lifespan )   // can tunnel
+          find lowest value path , ignore values less than 20
+          it is allowed removal of 1 terrain value (less than 200 ) per mile of length
+          
+     Cement paved ( high initial cost, long lifespan )  // can tunnel and create rises ( overpasses )
+          find lowest value path , ignore values less than 20
+          it is allowed removal of 1 terrain value (less than 200 ) per mile of length
+          minimum width 4 units ( 20 feet, 1 lane each direction) 
+          tunnel cost is high 100?
+          
+           
+// side thought  : cement paved = sidewalks?
+
+==========================
+Time for another rethink...
+
+A given area has a population density.
+     Represented as a heat map
+
+     At certain population levels minimum road level is upgraded
+          ( this allows 2 cities to connect with each other with freeways )
+
+Methods of transportation
+     Individual
+     Foot
+     Horse
+     Wagon
+     Bike
+     Car 
+     
+     Transit systems     
+               People movers?
+               Bus
+               Train
+                    Types
+                         Light Rail
+                         Train
+                         Subway
+                         Monorail
+               Airport
+               Boat
+               Teleporter/Portals
+
+// ... what is the level of technology?
+          
+  So population increases as residents move into buildings
+     // what about the homeless?
+     // homeless happen when population pressure from population growth exceeds local housing capacity
+     // random walk, if they end up in a free land area they will settle and build new house
+     // 
+   
+  Default population growth is 1.0 % per year
+          A 100 mile region  // crud i don't think it will be able to hand that large a simulation
+
+     
+======================
+
+wall
+door
+column
+ceiling
+click drag create.
+
+
+===============
+how do i keep track of what has been built?
+(perlin verses simplex : perlin is already in nice boxes. but I may want to upgrade to simplex later)
+Ok, so using perlin noise I generate numbers per node.
+
+
+Small Node distance 5 feet
+Medium Node distance 25 feet
+Large Node distance 125 feet
+XL  Node distance 625
+XXL Node distance 3125 
+5280 ft = 1 mi = 1 xxl + 1 medium + 1 small
+only calculate the local most nodes +/- 5 from where you stand
+
+
+If average of medium nodes of a region (corners) 
+ is greater then level-1 average by X then special ?
+ 
+If neighboring nodes have same value then create a larger region type, continue checking until they are no longer.
+
+
+ 
+ 
+
+
+
+
+
+if surrounding numbers of a node are equal or greater than the node number then = a building
+if surrounding numbers of a node are equal or near equal than the node number then = a subcompenent to a larger structure ( then check node values of next ring outwards to see what kind )
+
+
+
+
+
+
+Ok if I go the ontological path,
+    create roads first then buildings
+or 
+    create buildings first then roads?
+
+        Start at largest grid node evals
+            If it indicates building at location then
+
+=====================================================
+
+If we use the telelogical approach, here is my thoughts
+
+We could take a Agent oriented approach to city creation
+
+
+Agent Type List
+    PersonAgent
+    BuildingAgent
+    RoadAgent?
+    NeighborhoodAgent?
+    
+HeatMaps
+    Population
+ 
+PersonAgent
+    Birthdate
+    Wanderlust(amount)
+    LastRested
+    Position
+    //Size of building is determined by amount of wanderlust counter left. Starting at 30% of wander
+    // wander = wanderlust - time since last rested
+    // squarefootage required = wander
+    //
+    // If it goes negative, they will wander for an existing house, and will not build. If they enter a building the wanderlust is set to the absolute value of the negative amount
+    
+BuildingAgent //PropertyAgent
+    Birthdate
+        // If building does not have a road connected to it, it will create a road to the nearest road or building
+    ResidentPopulation
+    BuildBuilding() // Builds a random building 1 or 2 floor
+    
+    ExpandBuilding  // If existing building on the property, it will either add an adjoining building, or add floors
+    
+    Subdivide()
+    // If a new road runs through the property and it can fit it there is a 50% chance of redistributing the property 
+    //  This creates 2 properties    
+    // if building reaches max, but not the property, build another building on the property 
+    // If population reaches max, 1/4 of the population leaves and building gains a floor
+    
+    // If no roads are connected after rnd time , then connect with closest building by road
+    // Road should connect with property exit.
+    // 10% chance headon 90% chance for it to be build on the side of the property
+     
+RoadAgent
+    Position = Vector3 (x,y,z)
+    Size = Vector3 (length, width, type)
+    Direction = Vector2  (follows terrain)
+    
+    Connections to other roads with high preferance for right angle intersections
+    
+How about saving?
+    Export To Text, open as new tab? or copy paste field
+Load through import of text    
+    
+    
+    
+    
+IDEA :  Terrain will be generated with perlin noise but only for the areas visted
