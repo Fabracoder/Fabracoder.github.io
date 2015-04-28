@@ -1,0 +1,12 @@
+{
+    "jscodehints.detectedExclusions": [
+        "C:/Users/Oliver/Documents/GitHub/Fabracoder.github.io/cs116b/finalProj/PCG_Building.js",
+        "C:/Users/Oliver/Documents/GitHub/Fabracoder.github.io/cs116b/finalProj/PCG.js",
+        "C:/Users/Oliver/Documents/GitHub/Fabracoder.github.io/cs116b/finalProj/noiseGenerator.js",
+        "C:/Users/Oliver/Documents/GitHub/Fabracoder.github.io/cs116b/finalProj/Agent/lib/TrackballControls.js",
+        "C:/Users/Oliver/Documents/GitHub/Fabracoder.github.io/cs116b/finalProj/lib/TrackballControls.js",
+        "C:/Users/Oliver/Documents/GitHub/Fabracoder.github.io/cs116b/finalProj/Agent/lib/ThreeCSG.js",
+        "C:/Users/Oliver/Documents/GitHub/Fabracoder.github.io/cs116b/finalProj/lib/ThreeCSG.js",
+        "C:/Users/Oliver/Documents/GitHub/Fabracoder.github.io/cs116b/finalProj/lib/three.min.js"
+    ]
+}
