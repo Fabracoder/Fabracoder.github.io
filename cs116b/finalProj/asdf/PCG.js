@@ -1,5 +1,9 @@
+/*jslint white: true */
+/*jslint nomen: true */
+/*jslint vars: true */
+// disable jslint issue that I dont care about
 var floorHeight = 1000;
-var speed = 100000;
+var speed = 1000;
 var minBuildingSize;
 
 var MARGIN = 10;
@@ -12,7 +16,7 @@ var buildings = [];
 var dirLight, pointLight, ambientLight;
 var helper;
 var clock = new THREE.Clock();
-var minPlotSize =50; 
+var minPlotSize =50;
  
 var materialQ = new THREE.MeshPhongMaterial({
 
@@ -54,8 +58,9 @@ var materialQ = new THREE.MeshPhongMaterial({
      //   cameraInit();
 
      camera = new THREE.PerspectiveCamera(25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7);
-     camera.position.z = 200;
-     camera.position.y = 10;
+     camera.position.z = 0.0;
+     camera.position.y = 1000;
+     camera.lookAt(new THREE.Vector3(0,0,0) );
       
 
      //     SceneInit();
@@ -120,9 +125,9 @@ function initializeHelper(){
 		helper = new THREE.GridHelper(10000, minPlotSize);
         helper2 = new THREE.GridHelper(1000, minPlotSize/5);
 		helper.setColors(0x0000ff, 0x808080);
-		helper.position.y = 10;
+		helper.position.y = 1;
 		helper2.setColors(0xf0f00f, 0x008080);
-		helper2.position.y = 11;
+		helper2.position.y = 10;
 		helper.update = function()
 		{
 			helper.position.x = Math.floor(camera.position.x / minPlotSize) * minPlotSize;
@@ -137,12 +142,12 @@ function initializeHelper(){
 }
 function initializeAgents(){
     
- 
-    anAgent = new SimpleAgent(
-		{
-			name : "TeaPot",
-			id : 0
-		});
+// 
+//    anAgent = new SimpleAgent(
+//		{
+//			name : "TeaPot",
+//			id : 0
+//		});
     
     
 	aPerson = new PersonAgent(
@@ -158,10 +163,16 @@ function initializeAgents(){
     aPerson.startWander();
 
     var pAgent = new RoadAgent();
-     pAgent.setVisable(true);
-   var pAgent2 = new RoadAgent({direction:{x:0,y:1,z:0}});
-     pAgent.setVisable(true);
+    pAgent.setVisable(true);
+    
+   var pAgent2 = new RoadAgent({direction:{x:0,y: degreeToRadian(90) ,z:0},  position : new THREE.Vector3(50,0,0)});
+      pAgent2.setVisable(true);
 
+}
+
+function degreeToRadian(value)
+{
+    return (value/360)*2*Math.PI;
 }
 
  function onWindowResize(event) {
@@ -205,5 +216,3 @@ function initializeAgents(){
      renderer.render(scene, camera);
 
  };
-
-   

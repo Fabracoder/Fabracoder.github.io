@@ -11,8 +11,8 @@ var realAgentList =
 	[]; // list of all agents with mesh
 var materialsForAgents =
 	[]; // list of materials
-var activeAgents = 
-    []; // list for update to be called on. 
+var activeAgents =
+	[]; // list for update to be called on.
 
 // initialize materials for agents
 (function()
@@ -187,22 +187,28 @@ var RealAgent = function(parameters) //
 
 			_mesh = new THREE.Mesh(parameters.geometry, parameters.material);
 			_mesh.translateY(_height / 2);
-            if(parameters.geometryOffset===undefined)
-                {parameters.geometryOffset=0;}
+			if (parameters.geometryOffset === undefined)
+			{
+				parameters.geometryOffset = 0;
+			}
 			_mesh.translateZ(-parameters.geometryOffset);
 
 			_object.add(_mesh);
 
 			// scale, rotate, translate
-
 			if (parameters.position !== undefined)
 			{
 				// _setPosition(parameters.position);
-                console.log(_object);
-				_object.translateX = _object.position.x - parameters.position.x ; 
-				_object.translateY = _object.position.y - parameters.position.y ; 
-				_object.translateZ = _object.position.z - parameters.position.z ; 
-                
+
+				console.log(_object.position);
+				console.log(parameters.position);
+
+				_object.translateX(parameters.position.x);
+				_object.translateY(parameters.position.y);
+				_object.translateZ(parameters.position.z);
+
+				console.log(_object.position);
+
 				// _object.translateX(parameters.position.x);
 				// _object.translateY(parameters.position.y);
 				// _object.translateZ(parameters.position.z);
@@ -243,10 +249,15 @@ var RealAgent = function(parameters) //
 		}
 		else
 		{
-			_mesh = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32),  materialsForAgents[0]);
-//			_mesh.lookAt(new THREE.Vector3(0, 0, 1));
+			_mesh = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32), materialsForAgents[0]);
+			// _mesh.lookAt(new THREE.Vector3(0, 0, 1));
 			_birthdate = AgentClock.getElapsedTime();
 		}
+
+		_object.updateGeometry = function()
+		{
+
+		};
 	})();
 
 	var _scaleAgent = function(Vector3)
@@ -326,6 +337,38 @@ var RealAgent = function(parameters) //
 		_mesh = newMesh;
 	};
 
+	var _updateMesh = function(parameters)
+	{
+
+		var _geom, _mats, tempOffset;
+
+		if (parameters === undefined)
+		{
+			return;
+		}
+		if (parameters.geometry !== undefined)
+		{
+			_geom = parameters.geometry;
+
+			_mesh.geometry = _geom;
+			if (parameters.geometryOffset)
+				_mesh.translateZ(-parameters.geometryOffset);
+		}
+		else
+		{
+			_geom = _mesh.geometry;
+		}
+		if (parameters.material !== undefined)
+		{
+			_mats = parameters.material;
+			_mesh.material = _mats;
+		}
+		else
+		{
+			_mats = _mesh.material;
+		}
+
+	};
 	var _getObject = function()
 	{
 
@@ -353,11 +396,11 @@ var RealAgent = function(parameters) //
 		{
 			if (scene !== undefined)
 			{
-				scene.remove(_mesh);
+				scene.remove(_object);
 			}
 			else
 			{
-				window.scene.remove(_mesh);
+				window.scene.remove(_object);
 			}
 			return "Object removed";
 		}
@@ -365,11 +408,11 @@ var RealAgent = function(parameters) //
 		{
 			if (scene !== undefined)
 			{
-				scene.add(_mesh);
+				scene.add(_object);
 			}
 			else
 			{
-				window.scene.add(_mesh);
+				window.scene.add(_object);
 			}
 			return "Object added";
 		}
@@ -414,6 +457,8 @@ var RealAgent = function(parameters) //
 	this.scaleAgent = _scaleAgent;
 	this.getMesh = _getMesh;
 	this.setMesh = _setMesh;
+	this.updateMesh = _updateMesh;
+
 	this.getObject = _getObject;
 	this.setObject = _setObject;
 	this.getBirthdate = _getBirthdate;
@@ -436,9 +481,9 @@ var PersonAgent = function(parameters)
 	var _minWander;
 	var _maxWander;
 	var _money;
-	var _restless = Math.random() * 60 * 1; // time it wants to wander :
-    var _rest = clock.getElapsedTime(); // time last rested
-    var _isWandering = false;
+	var _restless = Math.random() * 60; // time it wants to wander in seconds
+	var _rest = clock.getElapsedTime(); // time last rested
+	var _isWandering = false;
 	(function()
 	{
 
@@ -477,7 +522,8 @@ var PersonAgent = function(parameters)
 	// other things to add
 	// {job,hunger,relatives,friends,health}
 	(function()
-	{ 
+	{
+
 		// _setWanderParams(parameters);
 		{
 			if (parameters === undefined)
@@ -509,15 +555,14 @@ var PersonAgent = function(parameters)
 			{
 				_wanderlust = parameters.wander;
 			}
-            if(parameters.direction !== undefined)
-                {
-                    _object.setDirection(parameters.direction);// ??
-                }
+			if (parameters.direction !== undefined)
+			{
+				_object.setDirection(parameters.direction);// ??
+			}
 		}
 		// _setWanderlust();
-		{
-			_wanderlust = (Math.random() * (parameters.maxWander - parameters.minWander)) + parameters.minWander;
-		}
+
+		_wanderlust = (Math.random() * (parameters.maxWander - parameters.minWander)) + parameters.minWander;
 
 		// _wanderlust = parameters.wanderlust; //above line does this
 		// already
@@ -530,15 +575,16 @@ var PersonAgent = function(parameters)
 	}());
 
 	var _setWanderlust = function(value)
-	{ 
-        if(value=== undefined)
-            {
-                _wanderlust = (Math.random() * (parameters.maxWander - parameters.minWander)) + parameters.minWander;
-            }
-        else
-            {
-                _wanderlust = value;
-            }
+	{
+
+		if (value === undefined)
+		{
+			_wanderlust = (Math.random() * (parameters.maxWander - parameters.minWander)) + parameters.minWander;
+		}
+		else
+		{
+			_wanderlust = value;
+		}
 	};
 
 	var _setWanderParams = function(parameters)
@@ -588,104 +634,99 @@ var PersonAgent = function(parameters)
 	};
 
 	var _startWander = function(bool)
-    {
-        if(bool===undefined)
-        _isWandering = true;
-        return;
-        
-        _isWandering= bool;
-	};
-    
-    var _updateAgent = function(parameters)
-    {
-
-        
-        
-        
-        
-        
-   var _SettleDown = function()
-	{ 
-		if (_restless - (_lastClockCall - _birthday) < _restless * 0.2)
-		{
-			return new THREE.Vector3(1000, 100000, 1000);
-		}
-		else
-		{
-			// console.log(this.restless-(this.lastClockCall-this.birthday));
-		}
-		// check if adequate nearby area can be claimed
-		// if found then it saves the x,y,z in size as a THREE.Vector3
-		// to be used
-		return null;
-	};
-    
-   	var _updateMove = function()
 	{
 
-		var delta = (clock.getElapsedTime() - this.lastClockCall);
-		this.lastClockCall = clock.getElapsedTime();
-
-		if (this.visable == false)
+		if (bool === undefined)
 		{
-			return
+			_isWandering = true;
+			return;
 		}
 
-		_object.translateX(this.direction.x * delta * 10 * SimulationSpeed);
-		_object.translateZ(this.direction.z * delta * 10 * SimulationSpeed);
-		// this.mesh.translateX((Math.random() - 0.5) *2 * delta*30);
-		// this.mesh.translateZ((Math.random() - 0.5) *2 * delta*30);
-
-		_size = _SettleDown();
-		if (_size == null)
-		{
-			if (_countdownchange < 1)
-			{
-				_countdownchange = Math.random() * 1000;
-				_directionChange = new THREE.Vector3((Math.random() - 0.5) * 3 * delta, 0, (Math.random() - 0.5) * 3 * delta);
-
-			}
-			else
-			{
-				_direction = this.direction.add(_directionChange);
-				_direction = this.direction.normalize();
-				_countdownchange--;
-			}
-
-		}
-		else
-		// create building
-		{
-			// check if nearby road, and build adjacent is so
-			// console.log(this);
-			console.log(_object.position);
-			// console.log(this.size);
-// var aBuilding = new BuildingAgent(this.mesh.position, this.size);
-
-// agentList.push(aBuilding);
-			// scene.add(aBuilding.mesh);
-			_setVisable(false);
-		}
-
-		// console.log(directionChange.x +":" +directionChange.z + " :->: " +
-		// this.direction.x + " : " + this.direction.z);
-
+		_isWandering = bool;
 	};
-     
-        
-    }
-    
-    
 
-    
-    
-    
+	var _updateAgent = function(parameters)
+	{
+
+		//           
+		//        
+		// var _SettleDown = function()
+		// {
+		// if (_restless - (_lastClockCall - _birthday) < _restless * 0.2)
+		// {
+		// return new THREE.Vector3(1000, 100000, 1000);
+		// }
+		// else
+		// {
+		// // console.log(this.restless-(this.lastClockCall-this.birthday));
+		// }
+		// // check if adequate nearby area can be claimed
+		// // if found then it saves the x,y,z in size as a THREE.Vector3
+		// // to be used
+		// return null;
+		// };
+		//    
+		// var _updateMove = function()
+		// {
+		//
+		// var delta = (clock.getElapsedTime() - this.lastClockCall);
+		// this.lastClockCall = clock.getElapsedTime();
+		//
+		// if (this.visable == false)
+		// {
+		// return
+		// }
+		//
+		// _object.translateX(this.direction.x * delta * 10 * SimulationSpeed);
+		// _object.translateZ(this.direction.z * delta * 10 * SimulationSpeed);
+		// // this.mesh.translateX((Math.random() - 0.5) *2 * delta*30);
+		// // this.mesh.translateZ((Math.random() - 0.5) *2 * delta*30);
+		//
+		// _size = _SettleDown();
+		// if (_size == null)
+		// {
+		// if (_countdownchange < 1)
+		// {
+		// _countdownchange = Math.random() * 1000;
+		// _directionChange = new THREE.Vector3((Math.random() - 0.5) * 3 *
+		// delta, 0, (Math.random() - 0.5) * 3 * delta);
+		//
+		// }
+		// else
+		// {
+		// _direction = this.direction.add(_directionChange);
+		// _direction = this.direction.normalize();
+		// _countdownchange--;
+		// }
+		//
+		// }
+		// else
+		// // create building
+		// {
+		// // check if nearby road, and build adjacent is so
+		// // console.log(this);
+		// console.log(_object.position);
+		// // console.log(this.size);
+		// // var aBuilding = new BuildingAgent(this.mesh.position, this.size);
+		//
+		// // agentList.push(aBuilding);
+		// // scene.add(aBuilding.mesh);
+		// _setVisable(false);
+		// }
+		//
+		// // console.log(directionChange.x +":" +directionChange.z + " :->: " +
+		// // this.direction.x + " : " + this.direction.z);
+		//
+		// };
+
+	}
+
 	this.startWander = _startWander;
 	this.setWanderParams = _setWanderParams;
-    
-    updateAgent :_updateAgent;
-    
-    setWanderlust :_setWanderlust;
+
+	updateAgent: _updateAgent;
+
+	setWanderlust: _setWanderlust;
 
 };
 PersonAgent.prototype = new RealAgent();
@@ -730,7 +771,7 @@ var BuildingAgent = function(parameters)
 	if (parameters.geometry === undefined)
 	{
 		parameters.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z);
-        parameters.geometryOffset = parameters.buildingSize.z/2;
+		parameters.geometryOffset = parameters.buildingSize.z / 2;
 	}
 
 	var _generatePortals = function(positions)
@@ -819,14 +860,26 @@ var RoadAgent = function(parameters)
 	var _rWidth = _laneCount * _laneWidth;
 	var _rHeight = Math.log(_laneCount * _laneWidth);
 	var _rLength = 500;
-	parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight/10, _rLength);
-    parameters.geometryOffset = _rLength/2;
-	console.log(_rWidth + "+" + _rHeight + "+" + _rLength);
+	parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight / 10, _rLength);
+	parameters.geometryOffset = _rLength / 2;
+	// console.log(_rWidth + "+" + _rHeight + "+" + _rLength);
 	// parameters.direction = new THREE.Vector3(0,0,0);
-	parameters.material = materialQ;
+	parameters.material = materialsForAgents[2];
 
 	RealAgent.call(this, parameters);
 
+	var _growLength = function(value)
+	{
+
+		_rLength = _rLength + value;
+		parameters.geometryOffset = value / 2;
+		parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight / 10, _rLength);
+		_m(parameters);
+		// _object = getObject();
+		// _object.updateGeometry(parameters);
+	};
+	var _m = this.updateMesh;
+	this.growLength = _growLength;
 };
 
 RoadAgent.prototype = new RealAgent();
