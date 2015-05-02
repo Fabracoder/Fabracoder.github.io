@@ -1,3 +1,4 @@
+// version 0.8 Agent Library
 /*jslint white: true */
 /*jslint nomen: true */
 /*jslint vars: true */
@@ -8,6 +9,50 @@ var agentList =
 	[]; // list of all agents
 var realAgentList =
 	[]; // list of all agents with mesh
+var materialsForAgents =
+	[]; // list of materials
+
+// initialize materials for agents
+(function()
+{
+
+	materialsForAgents.push(new THREE.MeshBasicMaterial(
+		{
+			color : 'yellow'
+		}));
+	materialsForAgents.push(new THREE.MeshPhongMaterial(
+		{
+
+			specular : 0x333333,
+			shininess : 15,
+			map : THREE.ImageUtils.loadTexture("Resources/final_textures/greyc.jpg")
+		// ,specularMap:
+		// THREE.ImageUtils.loadTexture("Resources/final_textures/ea_specular_2048.jpg")
+		}));
+
+	materialsForAgents.push(new THREE.MeshPhongMaterial(
+		{
+			// light
+			specular : '#010101',
+			// intermediate
+			color : '#883311',
+			// dark
+			// emissive: '#505063',
+			shininess : 50
+		}));
+	materialsForAgents.push(new THREE.MeshPhongMaterial(
+		{
+
+			specular : 0x333333,
+			shininess : 15,
+			map : THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048.jpg"),
+			specularMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea_specular_2048.jpg"),
+			normalMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea_normal_2048.jpg"),
+			normalScale : new THREE.Vector2(0.85, 0.85)
+
+		}));
+
+}())
 
 // parent to all agents
 // parameters {name,id}
@@ -108,10 +153,16 @@ var RealAgent = function(parameters) //
 	// var _geometry; // will be stored in the mesh
 	// var _material; // will be stored in the mesh
 	var _mesh;
+	var _object;
 	var _direction; // direction mesh is facing
 	var _position; // location of mesh
 	var _scale; // scaling of mesh
 	var _birthdate; // date created
+
+	var _wrapper = new THREE.Object3D();
+
+	// _wrapper.add(this.getMesh());
+	// this.setMesh(_wrapper);
 
 	// Initializing variables _name, _id if provided
 	// This function calls itself after declaring itself
@@ -120,32 +171,37 @@ var RealAgent = function(parameters) //
 	{
 
 		var _height = 10;
+		_object = new THREE.Object3D(); // higher scoped private obj
 		if (parameters !== undefined)
 		{
-
-			if (parameters.geometry === undefined)
+			if (parameters.geometry === undefined) // set default
 			{
 				parameters.geometry = new THREE.SphereGeometry(_height, 32, 32);
 			}
-			if (parameters.material === undefined)
+			if (parameters.material === undefined) // set default
 			{
-				parameters.material = new THREE.MeshBasicMaterial(
-					{
-						color : 'white'
-					});
+				parameters.material = materialsForAgents[0];
 			}
 
 			_mesh = new THREE.Mesh(parameters.geometry, parameters.material);
 			_mesh.translateY(_height / 2);
+			_mesh.translateZ(_height / 2);
+
+			_object.add(_mesh);
 
 			// scale, rotate, translate
 
 			if (parameters.position !== undefined)
 			{
-//				_setPosition(parameters.position);
-                _mesh.translateX(parameters.position.x);
-                _mesh.translateY(parameters.position.y);
-                _mesh.translateZ(parameters.position.z); 
+				// _setPosition(parameters.position);
+                console.log(_object);
+				_object.translateX = _object.position.x - parameters.position.x ; 
+				_object.translateY = _object.position.y - parameters.position.y ; 
+				_object.translateZ = _object.position.z - parameters.position.z ; 
+                
+				// _object.translateX(parameters.position.x);
+				// _object.translateY(parameters.position.y);
+				// _object.translateZ(parameters.position.z);
 			}
 			// else
 			// {
@@ -154,18 +210,19 @@ var RealAgent = function(parameters) //
 			// }
 			if (parameters.direction !== undefined)
 			{
-//				_mesh.lookAt(parameters.direction);
-                _mesh.rotateX(parameters.direction.x);
-                _mesh.rotateY(parameters.direction.y);
-                _mesh.rotateZ(parameters.direction.z);
-                
+				// _mesh.lookAt(parameters.direction);
+				_object.rotateX(parameters.direction.x);
+				_object.rotateY(parameters.direction.y);
+				_object.rotateZ(parameters.direction.z);
+
 				// _direction = direction;
 			}
 			else
 			{
-//                _mesh.rotateX(parameters.direction.x);
-//                _mesh.rotateY(parameters.direction.y);
-//                _mesh.rotateZ(parameters.direction.z);
+				// // default direction not needed
+				// _mesh.rotateX(parameters.direction.x);
+				// _mesh.rotateY(parameters.direction.y);
+				// _mesh.rotateZ(parameters.direction.z);
 				// _mesh.lookAt(new THREE.Vector3(0, 0, 1));
 				// .rotateOnAxis ?
 				// (axis.normalized, angleInRadians)
@@ -192,11 +249,13 @@ var RealAgent = function(parameters) //
 	})();
 
 	var _scaleAgent = function(Vector3)
-	{ 
-		_mesh.scale.set(Vector3.x, Vector3.y, Vector3.z);
+	{
+
+		_object.scale.set(Vector3.x, Vector3.y, Vector3.z);
 	};
 	var _getPosition = function()
-	{ 
+	{
+
 		return _mesh.position;
 	};
 
@@ -209,26 +268,26 @@ var RealAgent = function(parameters) //
 		}
 		if (parameters.position !== undefined)
 		{
-			_mesh.translateX = parameters.position.x;
-			_mesh.translateY = parameters.position.y;
-			_mesh.translateZ = parameters.position.z;
+			_object.translateX = parameters.position.x;
+			_object.translateY = parameters.position.y;
+			_object.translateZ = parameters.position.z;
 			return;
 		}
 		if (parameters.positionX !== undefined)
 		{
-			_mesh.translateX = parameters.positionX;
+			_object.translateX = parameters.positionX;
 		}
 		if (parameters.positionY !== undefined)
 		{
-			_mesh.translateY = parameters.positionY;
+			_object.translateY = parameters.positionY;
 		}
 		if (parameters.positionZ !== undefined)
 		{
-			_mesh.translateZ = parameters.positionZ;
+			_object.translateZ = parameters.positionZ;
 		}
 	};
 
-	var _translateMesh = function(parameters)
+	var _translateObject = function(parameters)
 	{
 
 		if (parameters === undefined)
@@ -237,22 +296,22 @@ var RealAgent = function(parameters) //
 		}
 		if (parameters.translate !== undefined)
 		{
-			_mesh.translateX = parameters.translate.x;
-			_mesh.translateY = parameters.translate.y;
-			_mesh.translateZ = parameters.translate.z;
+			_object.translateX = parameters.translate.x;
+			_object.translateY = parameters.translate.y;
+			_object.translateZ = parameters.translate.z;
 			return;
 		}
 		if (parameters.translateX !== undefined)
 		{
-			_mesh.translateX = parameters.translateX;
+			_object.translateX = parameters.translateX;
 		}
 		if (parameters.translateY !== undefined)
 		{
-			_mesh.translateY = parameters.translateY;
+			_object.translateY = parameters.translateY;
 		}
 		if (parameters.translateZ !== undefined)
 		{
-			_mesh.translateZ = parameters.translateZ;
+			_object.translateZ = parameters.translateZ;
 		}
 	};
 	var _getMesh = function()
@@ -266,6 +325,16 @@ var RealAgent = function(parameters) //
 		_mesh = newMesh;
 	};
 
+	var _getObject = function()
+	{
+
+		return _object;
+	}
+	var _setObject = function(newObj)
+	{
+
+		_object = newObj;
+	};
 	var _getBirthdate = function()
 	{
 
@@ -316,12 +385,21 @@ var RealAgent = function(parameters) //
 		{
 			if (parameters.position !== undefined)
 			{
-				_mesh.position = parameters.position;
+				_object.position = parameters.position;
+			}
+			if (parameters.direction !== undefined)
+			{
+				_object.rotateX(parameters.direction.x);
+				_object.rotateY(parameters.direction.y);
+				_object.rotateZ(parameters.direction.z);
+			}
+			if (parameters.lookAt !== undefined)
+			{
+				_object.lookAt(parameters.lookAt);
 			}
 
-			_classSpecificUpdate(parameters);
 		}
-
+		_classSpecificUpdate(parameters);
 	};
 	var _classSpecificUpdate = function(parameters)
 	{
@@ -331,14 +409,17 @@ var RealAgent = function(parameters) //
 
 	this.getPosition = _getPosition;
 	this.setPosition = _setPosition;
-	this.translateAgent = _translateMesh;
+	this.translateAgent = _translateObject;
 	this.scaleAgent = _scaleAgent;
 	this.getMesh = _getMesh;
 	this.setMesh = _setMesh;
+	this.getObject = _getObject;
+	this.setObject = _setObject;
 	this.getBirthdate = _getBirthdate;
 	this.setBirthdate = _setBirthdate;
 	this.setVisable = _setVisable;
 	this.updateAgent = _update;
+
 	realAgentList.push(this);
 };
 RealAgent.prototype = new SimpleAgent();
@@ -354,7 +435,9 @@ var PersonAgent = function(parameters)
 	var _minWander;
 	var _maxWander;
 	var _money;
-
+	var _restless = Math.random() * 60 * 1; // time it wants to wander :
+    var _rest = clock.getElapsedTime(); // time last rested
+    var _isWandering = false;
 	(function()
 	{
 
@@ -393,8 +476,7 @@ var PersonAgent = function(parameters)
 	// other things to add
 	// {job,hunger,relatives,friends,health}
 	(function()
-	{
-
+	{ 
 		// _setWanderParams(parameters);
 		{
 			if (parameters === undefined)
@@ -426,8 +508,12 @@ var PersonAgent = function(parameters)
 			{
 				_wanderlust = parameters.wander;
 			}
+            if(parameters.direction !== undefined)
+                {
+                    _object.setDirection(parameters.direction);// ??
+                }
 		}
-		// _resetRandomWander();
+		// _setWanderlust();
 		{
 			_wanderlust = (Math.random() * (parameters.maxWander - parameters.minWander)) + parameters.minWander;
 		}
@@ -442,10 +528,16 @@ var PersonAgent = function(parameters)
 		_money = parameters.money;
 	}());
 
-	var _resetRandomWander = function()
-	{
-
-		_wanderlust = (Math.random() * (parameters.maxWander - parameters.minWander)) + parameters.minWander;
+	var _setWanderlust = function(value)
+	{ 
+        if(value=== undefined)
+            {
+                _wanderlust = (Math.random() * (parameters.maxWander - parameters.minWander)) + parameters.minWander;
+            }
+        else
+            {
+                _wanderlust = value;
+            }
 	};
 
 	var _setWanderParams = function(parameters)
@@ -494,13 +586,105 @@ var PersonAgent = function(parameters)
 		return params;
 	};
 
-	var _startWander = function()
+	var _startWander = function(bool)
+    {
+        if(bool===undefined)
+        _isWandering = true;
+        return;
+        
+        _isWandering= bool;
+	};
+    
+    var _updateAgent = function(parameters)
+    {
+
+        
+        
+        
+        
+        
+   var _SettleDown = function()
+	{ 
+		if (_restless - (_lastClockCall - _birthday) < _restless * 0.2)
+		{
+			return new THREE.Vector3(1000, 100000, 1000);
+		}
+		else
+		{
+			// console.log(this.restless-(this.lastClockCall-this.birthday));
+		}
+		// check if adequate nearby area can be claimed
+		// if found then it saves the x,y,z in size as a THREE.Vector3
+		// to be used
+		return null;
+	};
+    
+   	var _updateMove = function()
 	{
 
-	};// TODO:
+		var delta = (clock.getElapsedTime() - this.lastClockCall);
+		this.lastClockCall = clock.getElapsedTime();
 
+		if (this.visable == false)
+		{
+			return
+		}
+
+		_object.translateX(this.direction.x * delta * 10 * SimulationSpeed);
+		_object.translateZ(this.direction.z * delta * 10 * SimulationSpeed);
+		// this.mesh.translateX((Math.random() - 0.5) *2 * delta*30);
+		// this.mesh.translateZ((Math.random() - 0.5) *2 * delta*30);
+
+		_size = _SettleDown();
+		if (_size == null)
+		{
+			if (_countdownchange < 1)
+			{
+				_countdownchange = Math.random() * 1000;
+				_directionChange = new THREE.Vector3((Math.random() - 0.5) * 3 * delta, 0, (Math.random() - 0.5) * 3 * delta);
+
+			}
+			else
+			{
+				_direction = this.direction.add(_directionChange);
+				_direction = this.direction.normalize();
+				_countdownchange--;
+			}
+
+		}
+		else
+		// create building
+		{
+			// check if nearby road, and build adjacent is so
+			// console.log(this);
+			console.log(_object.position);
+			// console.log(this.size);
+// var aBuilding = new BuildingAgent(this.mesh.position, this.size);
+
+// agentList.push(aBuilding);
+			// scene.add(aBuilding.mesh);
+			_setVisable(false);
+		}
+
+		// console.log(directionChange.x +":" +directionChange.z + " :->: " +
+		// this.direction.x + " : " + this.direction.z);
+
+	};
+     
+        
+    }
+    
+    
+
+    
+    
+    
 	this.startWander = _startWander;
-	this.setWanderParams = _setWanderParams(parameters);
+	this.setWanderParams = _setWanderParams;
+    
+    updateAgent :_updateAgent;
+    
+    setWanderlust :_setWanderlust;
 
 };
 PersonAgent.prototype = new RealAgent();
@@ -547,8 +731,12 @@ var BuildingAgent = function(parameters)
 		parameters.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.x, parameters.buildingSize.x);
 	}
 
-	var _generatePortals = function()
+	var _generatePortals = function(positions)
 	{
+
+		// positions contain global positions of where new doors are beng
+		// requested
+		// it will return false if it is unable to make a door there
 
 		// TODO: figure out where the doors are
 		// front of Building should always have a door
@@ -557,15 +745,29 @@ var BuildingAgent = function(parameters)
 	var _addResident = function(aPerson)
 	{
 
+		_residents.push(aPerson);
+	}
+	var _RemoveResident = function(aPerson)
+	{
+
+		_residents.pop(_residents.indexOf(aPerson));
 	}
 
 	RealAgent.call(this, parameters);
+
+	addResident: _addResident;
+	removeResident: _RemoveResident;
 
 };
 BuildingAgent.prototype = new RealAgent();
 BuildingAgent.prototype.constructor = BuildingAgent;
 
-var makeBuilding = function(position,direction,size,){};
+// position,direction,size,geometry
+var makeBuilding = function(parameters)
+{
+
+};
+
 // roads grow
 // initially as a dirt path ( 1 lane )
 // whose opacity slowly becomes 1 over a period of 5 seconds
@@ -612,14 +814,14 @@ var RoadAgent = function(parameters)
 	// if position and direction don't exist they default to 0,0,0 and
 	// 0,0,1;
 
-    var _rWidth =_laneCount * _laneWidth;
-    var _rHeight =Math.log(_laneCount * _laneWidth);
-    var _rLength = 500;
-	parameters.geometry = new THREE.BoxGeometry(_rWidth,_rHeight,_rLength);
-    console.log(_rWidth+"+"+_rHeight+"+"+_rLength);
-//    parameters.direction = new THREE.Vector3(0,0,0);
+	var _rWidth = _laneCount * _laneWidth;
+	var _rHeight = Math.log(_laneCount * _laneWidth);
+	var _rLength = 500;
+	parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight, _rLength);
+	console.log(_rWidth + "+" + _rHeight + "+" + _rLength);
+	// parameters.direction = new THREE.Vector3(0,0,0);
 	parameters.material = materialQ;
- 
+
 	RealAgent.call(this, parameters);
 
 };

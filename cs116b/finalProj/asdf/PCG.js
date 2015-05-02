@@ -10,8 +10,9 @@ var container, stats;
 var camera, controls, scene, sceneCube, renderer;
 var buildings = [];
 var dirLight, pointLight, ambientLight;
-
+var helper;
 var clock = new THREE.Clock();
+var minPlotSize =50; 
  
 var materialQ = new THREE.MeshPhongMaterial({
 
@@ -87,10 +88,8 @@ var materialQ = new THREE.MeshPhongMaterial({
      scene.add(floorMesh);
      
      initializeAgents();
-//     var pAgent = new RoadAgent();
-//     pAgent.setVisable(true);
-  
-     
+        
+     initializeHelper();
      
      renderer = new THREE.WebGLRenderer();
      renderer.setPixelRatio(window.devicePixelRatio);
@@ -108,7 +107,34 @@ var materialQ = new THREE.MeshPhongMaterial({
 
 
  };
+function initializeHelper(){
+ 	if (helper == false)
+	{
+		helper = new Object();
+		helper.update = function()
+		{
+		};
+	} else
+	{
+ //size,step_
+		helper = new THREE.GridHelper(10000, minPlotSize);
+        helper2 = new THREE.GridHelper(1000, minPlotSize/5);
+		helper.setColors(0x0000ff, 0x808080);
+		helper.position.y = 10;
+		helper2.setColors(0xf0f00f, 0x008080);
+		helper2.position.y = 11;
+		helper.update = function()
+		{
+			helper.position.x = Math.floor(camera.position.x / minPlotSize) * minPlotSize;
+			helper.position.z = Math.floor(camera.position.z / minPlotSize) * minPlotSize;
+            
+            helper2.position.x = Math.floor(camera.position.x / minPlotSize) * minPlotSize;
+			helper2.position.z = Math.floor(camera.position.z / minPlotSize) * minPlotSize;
+		};
+	}
 
+	scene.add(helper);
+}
 function initializeAgents(){
     
  
@@ -166,7 +192,10 @@ function initializeAgents(){
 
      controls.movementSpeed = speed * (delta);
      controls.update(delta);
-
+     if(helper!=null)
+         {
+             helper.update();
+         }
      //				renderer.clear();
      renderer.render(scene, camera);
 
