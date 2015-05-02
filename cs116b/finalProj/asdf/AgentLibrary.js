@@ -11,6 +11,8 @@ var realAgentList =
 	[]; // list of all agents with mesh
 var materialsForAgents =
 	[]; // list of materials
+var activeAgents = 
+    []; // list for update to be called on. 
 
 // initialize materials for agents
 (function()
@@ -170,7 +172,7 @@ var RealAgent = function(parameters) //
 	(function()
 	{
 
-		var _height = 10;
+		var _height = 4;
 		_object = new THREE.Object3D(); // higher scoped private obj
 		if (parameters !== undefined)
 		{
@@ -185,7 +187,9 @@ var RealAgent = function(parameters) //
 
 			_mesh = new THREE.Mesh(parameters.geometry, parameters.material);
 			_mesh.translateY(_height / 2);
-			_mesh.translateZ(_height / 2);
+            if(parameters.geometryOffset===undefined)
+                {parameters.geometryOffset=0;}
+			_mesh.translateZ(-parameters.geometryOffset);
 
 			_object.add(_mesh);
 
@@ -239,11 +243,8 @@ var RealAgent = function(parameters) //
 		}
 		else
 		{
-			_mesh = new THREE.Mesh(new THREE.SphereGeometry(10, 32, 32), new THREE.MeshBasicMaterial(
-				{
-					color : 'white'
-				}));
-			_mesh.lookAt(new THREE.Vector3(0, 0, 1));
+			_mesh = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32),  materialsForAgents[0]);
+//			_mesh.lookAt(new THREE.Vector3(0, 0, 1));
 			_birthdate = AgentClock.getElapsedTime();
 		}
 	})();
@@ -452,7 +453,7 @@ var PersonAgent = function(parameters)
 					minWander : _minWander = 5,
 					// time in seconds, 1 minute default max;
 
-					geometry : new THREE.SphereGeometry(100, 32, 32),
+					geometry : new THREE.SphereGeometry(5, 32, 32),
 					position : new THREE.Vector3(0, 50, 0)
 				};
 
@@ -728,7 +729,8 @@ var BuildingAgent = function(parameters)
 	}
 	if (parameters.geometry === undefined)
 	{
-		parameters.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.x, parameters.buildingSize.x);
+		parameters.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z);
+        parameters.geometryOffset = parameters.buildingSize.z/2;
 	}
 
 	var _generatePortals = function(positions)
@@ -817,7 +819,8 @@ var RoadAgent = function(parameters)
 	var _rWidth = _laneCount * _laneWidth;
 	var _rHeight = Math.log(_laneCount * _laneWidth);
 	var _rLength = 500;
-	parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight, _rLength);
+	parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight/10, _rLength);
+    parameters.geometryOffset = _rLength/2;
 	console.log(_rWidth + "+" + _rHeight + "+" + _rLength);
 	// parameters.direction = new THREE.Vector3(0,0,0);
 	parameters.material = materialQ;

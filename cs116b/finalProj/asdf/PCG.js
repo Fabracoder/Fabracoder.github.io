@@ -192,6 +192,11 @@ function initializeAgents(){
 
      controls.movementSpeed = speed * (delta);
      controls.update(delta);
+     for(var i =0;i<realAgentList.length;i++)
+         {
+             realAgentList[i].updateAgent();
+         }
+     
      if(helper!=null)
          {
              helper.update();
