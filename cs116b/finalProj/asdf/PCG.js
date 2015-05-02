@@ -53,8 +53,8 @@ var materialQ = new THREE.MeshPhongMaterial({
      //   cameraInit();
 
      camera = new THREE.PerspectiveCamera(25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7);
-     camera.position.z = 100;
-     camera.position.y = floorHeight * 2;
+     camera.position.z = 200;
+     camera.position.y = 10;
       
 
      //     SceneInit();
@@ -132,6 +132,8 @@ function initializeAgents(){
     aPerson.startWander();
 
     var pAgent = new RoadAgent();
+     pAgent.setVisable(true);
+   var pAgent2 = new RoadAgent({direction:{x:0,y:1,z:0}});
      pAgent.setVisable(true);
 
 }
