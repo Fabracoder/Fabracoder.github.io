@@ -142,7 +142,10 @@ var RealAgent = function(parameters) //
 
 			if (parameters.position !== undefined)
 			{
-				_setPosition(parameters.position);
+//				_setPosition(parameters.position);
+                _mesh.translateX(parameters.position.x);
+                _mesh.translateY(parameters.position.y);
+                _mesh.translateZ(parameters.position.z); 
 			}
 			// else
 			// {
@@ -151,12 +154,19 @@ var RealAgent = function(parameters) //
 			// }
 			if (parameters.direction !== undefined)
 			{
-				_mesh.lookAt(parameters.direction);
+//				_mesh.lookAt(parameters.direction);
+                _mesh.rotateX(parameters.direction.x);
+                _mesh.rotateY(parameters.direction.y);
+                _mesh.rotateZ(parameters.direction.z);
+                
 				// _direction = direction;
 			}
 			else
 			{
-				_mesh.lookAt(new THREE.Vector3(0, 0, 1));
+//                _mesh.rotateX(parameters.direction.x);
+//                _mesh.rotateY(parameters.direction.y);
+//                _mesh.rotateZ(parameters.direction.z);
+				// _mesh.lookAt(new THREE.Vector3(0, 0, 1));
 				// .rotateOnAxis ?
 				// (axis.normalized, angleInRadians)
 			}
@@ -182,13 +192,11 @@ var RealAgent = function(parameters) //
 	})();
 
 	var _scaleAgent = function(Vector3)
-	{
-
+	{ 
 		_mesh.scale.set(Vector3.x, Vector3.y, Vector3.z);
 	};
 	var _getPosition = function()
-	{
-
+	{ 
 		return _mesh.position;
 	};
 
@@ -323,7 +331,7 @@ var RealAgent = function(parameters) //
 
 	this.getPosition = _getPosition;
 	this.setPosition = _setPosition;
-	this.translateAgent = _translate;
+	this.translateAgent = _translateMesh;
 	this.scaleAgent = _scaleAgent;
 	this.getMesh = _getMesh;
 	this.setMesh = _setMesh;
@@ -557,6 +565,7 @@ var BuildingAgent = function(parameters)
 BuildingAgent.prototype = new RealAgent();
 BuildingAgent.prototype.constructor = BuildingAgent;
 
+var makeBuilding = function(position,direction,size,){};
 // roads grow
 // initially as a dirt path ( 1 lane )
 // whose opacity slowly becomes 1 over a period of 5 seconds
@@ -603,10 +612,14 @@ var RoadAgent = function(parameters)
 	// if position and direction don't exist they default to 0,0,0 and
 	// 0,0,1;
 
-	parameters.geometry = new THREE.BoxGeometry(_laneCount * _laneWidth, Math.log(_laneCount * _laneWidth * 100), 500);
-	parameters.materials = materialQ;
-	console.log(_laneWidth + ":" + _laneCount);
-	// parameters.geometry = new THREE.BoxGeometry(1000,1000,1000) ;
+    var _rWidth =_laneCount * _laneWidth;
+    var _rHeight =Math.log(_laneCount * _laneWidth);
+    var _rLength = 500;
+	parameters.geometry = new THREE.BoxGeometry(_rWidth,_rHeight,_rLength);
+    console.log(_rWidth+"+"+_rHeight+"+"+_rLength);
+//    parameters.direction = new THREE.Vector3(0,0,0);
+	parameters.material = materialQ;
+ 
 	RealAgent.call(this, parameters);
 
 };
