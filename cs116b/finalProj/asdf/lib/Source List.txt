@@ -1,0 +1,7 @@
+https://gist.github.com/banksean/304522/download#
+http://chandlerprall.github.io/Physijs/
+http://threejs.org/
+	- misc_controls_fly.html  (for the stars)
+
+http://evanw.github.io/csg.js/
+https://github.com/chandlerprall/ThreeCSG
