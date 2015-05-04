@@ -188,7 +188,7 @@ function degreeToRadian(value)
 //     composer.reset();
 
  };
-
+ 
  function animate() {
 
      requestAnimationFrame(animate);
