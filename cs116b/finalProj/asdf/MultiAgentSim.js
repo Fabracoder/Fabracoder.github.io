@@ -3,7 +3,11 @@
 /*jslint vars: true */
 // disable jslint issue that I dont care about
 var floorHeight = 1000;
-var speed = 1000;
+var speed = 10000;
+var cameraX=0;
+var cameraY=600;
+var cameraZ=0;
+
 var minBuildingSize;
 
 var MARGIN = 10;
@@ -58,8 +62,9 @@ var materialQ = new THREE.MeshPhongMaterial({
      //   cameraInit();
 
      camera = new THREE.PerspectiveCamera(25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7);
-     camera.position.z = 0.0;
-     camera.position.y = 1000;
+     camera.position.z = cameraZ;
+     camera.position.x = cameraX;     
+     camera.position.y = cameraY;
      camera.lookAt(new THREE.Vector3(0,0,0) );
       
 
@@ -90,9 +95,10 @@ var materialQ = new THREE.MeshPhongMaterial({
      var floorMesh = new THREE.Mesh(floorGeometry, materialNormalMap);
      floorMesh.recieveShadow = true;
      floorMesh.translateY(-floorHeight/2);
-     scene.add(floorMesh);
+ //    scene.add(floorMesh);
      
-     initializeAgents();
+ //    initializeAgents();
+     runTest();
         
      initializeHelper();
      
@@ -169,7 +175,12 @@ function initializeAgents(){
       pAgent2.setVisable(true);
 
 }
-
+function runTest(){
+  
+    CreateTerrain();
+    
+    
+}
 function degreeToRadian(value)
 {
     return (value/360)*2*Math.PI;

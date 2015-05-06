@@ -74,7 +74,7 @@ var SimpleAgent = function(parameters)
 		if (parameters === undefined)
 		{
 			_name = "Agent";
-			_id = Math.random();
+			_id = THREE.Math.generateUUID();
 		}
 		else
 		{
@@ -719,7 +719,7 @@ var PersonAgent = function(parameters)
 		//
 		// };
 
-	}
+	};
 
 	this.startWander = _startWander;
 	this.setWanderParams = _setWanderParams;
@@ -786,8 +786,7 @@ var BuildingAgent = function(parameters)
 	};
 
 	var _addResident = function(aPerson)
-	{
-
+	{ 
 		_residents.push(aPerson);
 	}
 	var _RemoveResident = function(aPerson)
@@ -798,8 +797,8 @@ var BuildingAgent = function(parameters)
 
 	RealAgent.call(this, parameters);
 
-	addResident: _addResident;
-	removeResident: _RemoveResident;
+	addResident : _addResident;
+	removeResident : _RemoveResident;
 
 };
 BuildingAgent.prototype = new RealAgent();
@@ -808,7 +807,7 @@ BuildingAgent.prototype.constructor = BuildingAgent;
 // position,direction,size,geometry
 var makeBuilding = function(parameters)
 {
-
+'use strict';
 };
 
 // roads grow
