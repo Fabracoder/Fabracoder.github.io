@@ -564,8 +564,9 @@ var PersonAgent = function(parameters)
 	var _restless = Math.random() * 60; // time it wants to wander in seconds
 	var _rest = clock.getElapsedTime(); // time last rested
 	var _isWandering = true; // set to false when residing in a building
-	var _direction;
+	var _direction; // direction facing
 	var _speed = 1;// speed = feet per update?
+    var _directionTime = {count:0,newDirection: new THREE.Vector3((Math.random() - .5) * 2, 0, (Math.random() - .5) * 2)};
 
 	function resetDirection(parameters)
 	{
@@ -758,7 +759,24 @@ var PersonAgent = function(parameters)
 			}
 
 		}
+        else{
+            
+        }
+        
+        if(_directionTime.count<0)
+            {
+                   _directionTime.newDirection = new THREE.Vector3((Math.random()-0.5)*2,0,(Math.random()-0.5)*2);
 
+                    _directionTime.count = 100*Math.random();
+            }
+       else
+              {    
+  //          _direction = _direction.addVectors(_direction,_directionTime.newDirection).normalize();
+       		  _direction = _direction.add(_directionTime.newDirection.multiplyScalar(0.4));
+              _direction = _direction.normalize();
+                  _directionTime.count-=1;
+       }
+        console.log(_direction.x+" "+_direction.y+" "+_direction.z+" ");
 		//           
 		//        
 		// var _SettleDown = function()
@@ -982,8 +1000,7 @@ var RoadAgent = function(parameters)
 	RealAgent.call(this, parameters);
 
 	var _growLength = function(value)
-	{
-
+	{ 
 		_rLength = _rLength + value;
 		parameters.geometryOffset = value / 2;
 		parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight / 10, _rLength);
