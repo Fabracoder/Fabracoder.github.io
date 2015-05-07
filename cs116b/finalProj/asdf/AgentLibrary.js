@@ -14,6 +14,11 @@ var materialsForAgents =
 var activeAgents =
 	[]; // list for update to be called on.
 
+if (scene === undefined)
+{
+	var scene = new THREE.Scene();
+}
+
 // initialize materials for agents
 (function()
 {
@@ -64,9 +69,9 @@ var SimpleAgent = function(parameters)
 	'use strict';
 	// private variable contains name of class or object
 	// private variable should contain unique id
-	var _name, _id;
+	var _name, _uuid;
 
-	// Initializing variables _name, _id if provided
+	// Initializing variables _name, _uuid if provided
 	// This function calls itself after declaring itself
 	(function()
 	{
@@ -74,7 +79,7 @@ var SimpleAgent = function(parameters)
 		if (parameters === undefined)
 		{
 			_name = "Agent";
-			_id = THREE.Math.generateUUID();
+			_uuid = Math.random();
 		}
 		else
 		{
@@ -89,12 +94,15 @@ var SimpleAgent = function(parameters)
 
 			if (parameters.id !== undefined)
 			{
-				_id = parameters.id;
+				_uuid = parameters.id;
 			}
 			else
 			{
 				// probably a better way of picking an unique
-				_id = Math.random();
+				// found it, THREEjs has its own uuid generator
+				// _uuid = THREE.Math.generateUUID();
+				_uuid = Math.random();
+				// THREE.Math.generateUUID();;
 			}
 		}
 	})();
@@ -114,18 +122,19 @@ var SimpleAgent = function(parameters)
 	var _getID = function()
 	{
 
-		return _id;
+		return _uuid;
 	};
 	var _setID = function(newID)
 	{
 
-		_id = newID;
+		_uuid = newID;
 	};
 
 	this.getName = _getName;
 	this.setName = _setName;
 	this.getID = _getID;
-	this.setID = _setID;
+	this.setID = _setID; // should not be used
+	this.type = "Agent"; // name of class
 
 	agentList.push(this);
 };
@@ -163,10 +172,71 @@ var RealAgent = function(parameters) //
 
 	var _wrapper = new THREE.Object3D();
 
+	// this.rays = [_direction];
+	var _caster = new THREE.Raycaster();
+
+	var intersects = _caster.intersectObjects(scene.children);
+	var INTERSECTED;
+	var collision = function()
+	{
+
+		'use strict';
+		var collisions, i,
+		// Maximum distance from the origin before we consider collision
+		distance = 8,
+		// Get the obstacles array from our scene
+		obstacles = scene.children;
+
+		// We reset the raycaster to this direction
+		this._caster.set(this.mesh.position, _direction);
+		// Test if we intersect with any obstacle mesh
+		collisions = this._caster.intersectObjects(obstacles);
+		// And disable that direction if we do
+		if (collisions.length > 0 && collisions[0].distance <= distance)
+		{
+			console.log(collisions[0].name);
+			// TODO: check if it is a building, if so avoid if wanderlust > 50%
+			// avoid by setting new direction (immediate. not a gradual curve)
+		}
+	}
+
+	if (intersects.length > 0)
+	{
+
+		if (INTERSECTED != intersects[0].object)
+		{
+
+			if (INTERSECTED)
+				INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+
+			INTERSECTED = intersects[0].object; // object intersected with
+			INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex(); // do
+			// stuff
+			// to
+			// object
+			// pointed
+			// at
+			// (highlight)
+			INTERSECTED.material.emissive.setHex(0xff0000);
+
+		}
+
+	}
+	else
+	{
+
+		if (INTERSECTED)
+			INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex); // un
+		// highlight
+
+		INTERSECTED = null;
+
+	}
+
 	// _wrapper.add(this.getMesh());
 	// this.setMesh(_wrapper);
 
-	// Initializing variables _name, _id if provided
+	// Initializing variables _name, _uuid if provided
 	// This function calls itself after declaring itself
 	// also provides a local private scope
 	(function()
@@ -200,14 +270,9 @@ var RealAgent = function(parameters) //
 			{
 				// _setPosition(parameters.position);
 
-				console.log(_object.position);
-				console.log(parameters.position);
-
 				_object.translateX(parameters.position.x);
 				_object.translateY(parameters.position.y);
 				_object.translateZ(parameters.position.z);
-
-				console.log(_object.position);
 
 				// _object.translateX(parameters.position.x);
 				// _object.translateY(parameters.position.y);
@@ -306,26 +371,39 @@ var RealAgent = function(parameters) //
 		{
 			return;
 		}
-		if (parameters.translate !== undefined)
+
+		if (parameters.distance !== undefined && parameters.direction !== undefined)
 		{
-			_object.translateX = parameters.translate.x;
-			_object.translateY = parameters.translate.y;
-			_object.translateZ = parameters.translate.z;
+			_mesh.translateOnAxis(parameters.direction.normalize(), parameters.distance);
 			return;
 		}
-		if (parameters.translateX !== undefined)
+
+		if (parameters.translate !== undefined)
 		{
-			_object.translateX = parameters.translateX;
+			_mesh.translateX(parameters.translate.x);
+			_mesh.translateY(parameters.translate.y);
+			_mesh.translateZ(parameters.translate.z);
+			return;
 		}
-		if (parameters.translateY !== undefined)
+		else
 		{
-			_object.translateY = parameters.translateY;
+			if (parameters.translateX !== undefined)
+			{
+				_mesh.translateX(parameters.translateX);
+			}
+			if (parameters.translateY !== undefined)
+			{
+				_mesh.translateX(parameters.translateY);
+			}
+			if (parameters.translateZ !== undefined)
+			{
+				_mesh.translateX(parameters.translateZ);
+			}
+			return;
 		}
-		if (parameters.translateZ !== undefined)
-		{
-			_object.translateZ = parameters.translateZ;
-		}
+
 	};
+
 	var _getMesh = function()
 	{
 
@@ -443,8 +521,9 @@ var RealAgent = function(parameters) //
 			}
 
 		}
-		_classSpecificUpdate(parameters);
+		this.classSpecificUpdate(parameters);
 	};
+
 	var _classSpecificUpdate = function(parameters)
 	{
 
@@ -465,6 +544,7 @@ var RealAgent = function(parameters) //
 	this.setBirthdate = _setBirthdate;
 	this.setVisable = _setVisable;
 	this.updateAgent = _update;
+	this.classSpecificUpdate = _classSpecificUpdate;
 
 	realAgentList.push(this);
 };
@@ -476,14 +556,28 @@ var PersonAgent = function(parameters)
 {
 
 	'use strict';
-
+	// 
 	var _wanderlust;
-	var _minWander;
-	var _maxWander;
+	var _minWander; // min time to set wanderlust
+	var _maxWander; // max time for wanderlust
 	var _money;
 	var _restless = Math.random() * 60; // time it wants to wander in seconds
 	var _rest = clock.getElapsedTime(); // time last rested
-	var _isWandering = false;
+	var _isWandering = true; // set to false when residing in a building
+	var _direction;
+	var _speed = 1;// speed = feet per update?
+
+	function resetDirection(parameters)
+	{
+
+		_direction = new THREE.Vector3((Math.random() - .5) * 2, 0, (Math.random() - .5) * 2);
+
+		if (parameters)
+		{
+			_direction = parameters.direction;
+		}
+	}
+
 	(function()
 	{
 
@@ -515,6 +609,8 @@ var PersonAgent = function(parameters)
 		{
 			parameters.money = Math.random() * 1000000 + 10;
 		}
+
+		resetDirection();
 	}());
 	// we set the default parameters before we call the super
 	RealAgent.call(this, parameters);
@@ -645,8 +741,23 @@ var PersonAgent = function(parameters)
 		_isWandering = bool;
 	};
 
-	var _updateAgent = function(parameters)
+	var _classSpecificUpdate = function(parameters)
 	{
+
+		if (_isWandering)// if the person is wandering then move
+		{
+			// TODO: I need to get direction from somewhere or make it
+			this.translateAgent(
+				{
+					direction : _direction,
+					distance : _speed
+				});
+			if (_wanderlust <= 0)
+			{
+				_isWandering = false;
+			}
+
+		}
 
 		//           
 		//        
@@ -723,8 +834,9 @@ var PersonAgent = function(parameters)
 
 	this.startWander = _startWander;
 	this.setWanderParams = _setWanderParams;
-
-	updateAgent: _updateAgent;
+	this.classSpecificUpdate = _classSpecificUpdate; // runs this on at end
+	// of update function
+	// for obj
 
 	setWanderlust: _setWanderlust;
 
@@ -786,7 +898,8 @@ var BuildingAgent = function(parameters)
 	};
 
 	var _addResident = function(aPerson)
-	{ 
+	{
+
 		_residents.push(aPerson);
 	}
 	var _RemoveResident = function(aPerson)
@@ -797,8 +910,8 @@ var BuildingAgent = function(parameters)
 
 	RealAgent.call(this, parameters);
 
-	addResident : _addResident;
-	removeResident : _RemoveResident;
+	addResident: _addResident;
+	removeResident: _RemoveResident;
 
 };
 BuildingAgent.prototype = new RealAgent();
@@ -807,7 +920,8 @@ BuildingAgent.prototype.constructor = BuildingAgent;
 // position,direction,size,geometry
 var makeBuilding = function(parameters)
 {
-'use strict';
+
+	'use strict';
 };
 
 // roads grow

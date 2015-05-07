@@ -26,11 +26,11 @@ var CreateTerrain = function(parameters) // x,y location , world seed, size of p
             parameters.size =  {x:1000,y:1000};
         }
     
-    var subsub = 64;
+    var subsub = 50;
     var subX =subsub,subY=subsub;
-    var boxHeight=100,boxX =  100,boxY =  100;
+    var boxHeight=100,boxX =  10000 ,boxY =  10000;
     // note all of this is because its rotated for easier data insertion
-    var geometry = new THREE.BoxGeometry( boxHeight, boxY, boxX,1,subY, subX );  
+    var geometry = new THREE.TerrainGeometry( boxHeight, boxY, boxX,1,subY, subX );  
 //    var geometry = new THREE.TerrainGeometry(100,100,100,100,100,100);
     var material = new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x009900, shininess: 30, shading: THREE.FlatShading , wireframe:false} );//new THREE.MeshBasicMaterial( {color: 0x00ff00,wireframe:true} );
      
@@ -39,61 +39,146 @@ var CreateTerrain = function(parameters) // x,y location , world seed, size of p
     customTerra.rotateZ(degreeToRadian(90));
      var centerPosition = {x:0,y:0}; 
     
-    var data = generateHeight2(subX,subY,{x:0,y:0},120);
-    for(var i =0;i<customTerra.geometry.vertices.length;i++)
-    {customTerra.geometry.vertices[i]=new THREE.Vector3(data[i]*100,customTerra.geometry.vertices[i].y,customTerra.geometry.vertices[i].z);}
+//    var data = generateHeight2(subX,subY,{x:0,y:0},1422,100);
+    var data = generateHeight3(subX,subY,{x:0,y:0},1,5,100,{boxX,boxY});
+    
+//    var data = generateHeight(subX,subY,{x:0,y:0},13,100);
+    
+    
+    for(var i =1;i<customTerra.geometry.vertices.length;i++)
+    {customTerra.geometry.vertices[i]=new THREE.Vector3(data[i],customTerra.geometry.vertices[i].y,customTerra.geometry.vertices[i].z);}
     
 scene.add( customTerra );
  
     
-}
+} 
 
-
-
-function generateHeight(xVerticeCount,yVerticeCount, position, seed ) {
-
-    var seed1 = seed|| Math.random *100;
-    var size = xVerticeCount * yVerticeCount, data = new Uint8Array( size );
-   // perlin = new ImprovedNoise(), quality = 1, z = seed1;
-
-    for ( var j = 0; j < 4; j ++ ) {
-
-        for ( var i = 0; i < size; i ++ ) {
-
-            var x = i % width, y = ~~ ( i / width ); // the ~~ basically truncates the decimal value
-            data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
-
-        }
-
-        quality *= 5;
-
-    }
-
-    return data;
-
-}
-
-
-function generateHeight2(xVerticeCount,yVerticeCount, position, seed ) {
-
-    var seed1 = seed|| Math.random *100;
+function generateHeight(xVerticeCount,yVerticeCount, position, seed,maxHeight  ) 
+{
     var data = new Uint8Array( xVerticeCount * yVerticeCount );
-  
+        
     for(var i=0;i<=yVerticeCount;i++)
         {
             for(var j=0;j<=xVerticeCount;j++)
             {
-                data[i*yVerticeCount+j] = 
-                    getExtensionValue(j+position.x,i+position.y,seed,100)+
-                    getExtensionValue(j+position.x,i+position.y,seed,50)+               
-                    getExtensionValue(j+position.x,i+position.y,seed,10);
+                data[i*yVerticeCount+j] =  interpolateNumbers(i,j,i/j);
+            }
+        }
+     
+    return data;
+}
+
+function generateHeight2(xVerticeCount,yVerticeCount, position, seed,maxHeight  ) 
+{
+
+    var seed1 = seed|| Math.random *100;
+    var data = new Uint8Array( xVerticeCount * yVerticeCount );
+    var a= 10,b = 50,c = 10;
+    for(var i=0;i<=yVerticeCount;i++)
+        {
+            for(var j=0;j<=xVerticeCount;j++)
+            {
+                var result = 0;
+                 
+                var temp1 = j*(a/xVerticeCount)+position.x;
+                var temp2 = i*(a/yVerticeCount)+position.y;
+                result+= getExtensionValue(temp1,temp2,seed,a)*1;
+                var temp1 = j*(b/xVerticeCount)+position.x;
+                var temp2 = i*(b/yVerticeCount)+position.y;
+                result+= getExtensionValue(temp1,temp2,seed,b)*0;
+                var temp1 = j*(c/xVerticeCount)+position.x;
+                var temp2 = i*(c/yVerticeCount)+position.y;
+                result+= getExtensionValue(temp1,temp2,seed,c)*0;
+
+                result= (result%1)*maxHeight;
+                
+                data[i*yVerticeCount+j] = result;
             }
         } 
     return data;
 
 }
 
+function generateHeight3(xVerticeCount,yVerticeCount, position, seed,stepSize,maxHeight,size  ) 
+{
+    
+    var seed1 = seed|| new Date().getTime();
+    var size_ = size||{x:0,y:0};
+    
+    var MTwister = new MersenneTwister(seed);
+    
+    var data = new Uint8Array( xVerticeCount * yVerticeCount );
+    var a= 100,b = 50,c = 10;
+    var result;
+    for(var i=0;i<=yVerticeCount;i++)
+        {
+            for(var j=0;j<=xVerticeCount;j++)
+            {
+                result = 0;
+                  
+                var temp1 = (size_.x / xVerticeCount)*j + position.x;; // this location's x
+                var temp2 = (size_.y / yVerticeCount)*i + position.y;; // this location's y
+ 
+  
+                for(var q=5;q<150;q=q*5)
+                    {
+                        result += getSumNodeHeight(temp1,temp2,seed,q,100);
+                    }
+//                result= (temp1+temp2)*maxHeight;
+                
+                data[i*yVerticeCount+j] = result;
+                
+//                console.log(i+":"+j+"~"+temp1+":"+temp2+":"+temp3+":"+temp4+":"+temp5+"!"+result);
+            }
+        } 
+    return data;
+    
+}
 
+function generatePerlinHeight(){
+    
+    
+    
+}
+
+
+
+function getSumNodeHeight(x,y,seed,stepSize,maxHeight){
+                var xsh = x;
+                var ysh = y;
+    
+                var xLeft = xsh-xsh%stepSize; //x left 
+                var xRight = xsh-xsh%stepSize +stepSize ; //x right
+//                var xT = (xsh%stepSize) /stepSize;   //t1
+                var xT = (xsh-xLeft)/(xRight-xLeft) ;   //t1
+    
+                   
+                var yDown = ysh-ysh%stepSize; // y bottom
+                var yUp = ysh-ysh%stepSize +stepSize ; // y top
+//                var yT = (ysh%stepSize) /stepSize;   //t2
+                var yT = (ysh-yDown)/(ysh-yUp);   //t2
+    
+                
+            
+                var xnyn = getNodeValue(xLeft,yDown,seed);
+                var xnyp = getNodeValue(xLeft,yUp,seed);
+                var xpyn = getNodeValue(xRight,yDown,seed);
+                var xpyp = getNodeValue(xRight,yUp,seed);
+    
+                var result = interpolateNumbers( interpolateNumbers(xnyn,xnyp,xT), interpolateNumbers(xpyn,xpyp,xT),yT) * maxHeight;  
+    console.log(" x"+xsh+" y"+ysh+" xL"+xLeft+" xR"+xRight+" yT"+yUp+" yB"+yDown+" xT"+xT+" yT"+yT);
+    return result;
+}
+
+function getNodeValue(x,y,seed){
+    var MT = new MersenneTwister(seed+(x+y));
+    
+    for(var asdf =0;asdf<(x%20);asdf++)
+        {
+            MT.genrand_real1();
+        } 
+    return MT.genrand_real1(); 
+}
  
 function getExtensionValue (x,y,seed,step){
     if(x===0)
@@ -110,11 +195,11 @@ function getExtensionValue (x,y,seed,step){
         {y=1;}
     
     var ax = x-x%step ;
-    var bx = x+x%step ;
+    var bx = x-x%step +step ;
     var tx = ax/bx;
 
     var ay = y-y%step ;
-    var by = y+y%step ;
+    var by = y-y%step +step;
     var ty = ay/by;
     
     var a,b,c,d;
@@ -132,8 +217,8 @@ function getExtensionValue (x,y,seed,step){
 
 function generateRnd1(x,y,seed)
 {
-    var a =  (x*(y+1));
-    var b =  (y*(x+1)); 
+    var a =  (x*(y+seed+1997));
+    var b =  (y*(x+seed+1997)); 
     return    (((a<b)?a*(seed+b)+b:b*(seed+a)+a)/seed)%1 ; //[0,1]
 }
 

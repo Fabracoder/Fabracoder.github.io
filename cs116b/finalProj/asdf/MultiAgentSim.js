@@ -5,7 +5,7 @@
 var floorHeight = 1000;
 var speed = 100000;
 var cameraX=0;
-var cameraY=1000;
+var cameraY=2000;
 var cameraZ=0;
 
 var minBuildingSize;
@@ -54,18 +54,22 @@ var materialQ = new THREE.MeshPhongMaterial({
  init();
  animate();
 
- function init() {
 
-     container = document.createElement('div');
-     document.body.appendChild(container);
-
-     //   cameraInit();
-
+function cameraInit(){
      camera = new THREE.PerspectiveCamera(25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7);
      camera.position.z = cameraZ;
      camera.position.x = cameraX;     
      camera.position.y = cameraY;
      camera.lookAt(new THREE.Vector3(0,0,0) );
+}
+
+ function init() {
+
+     container = document.createElement('div');
+     document.body.appendChild(container);
+
+        cameraInit();
+
       
 
      //     SceneInit();
@@ -95,10 +99,10 @@ var materialQ = new THREE.MeshPhongMaterial({
      var floorMesh = new THREE.Mesh(floorGeometry, materialNormalMap);
      floorMesh.recieveShadow = true;
      floorMesh.translateY(-floorHeight/2);
- //    scene.add(floorMesh);
+     scene.add(floorMesh);
      
- //    initializeAgents();
-     runTest();
+     initializeAgents();
+ //    runTest();
         
      initializeHelper();
      
@@ -166,7 +170,7 @@ function initializeAgents(){
     
 	// (name, id, geometry, position, direction, birthdate, wanderlust,money,)
 	aPerson.setVisable(true);
-    aPerson.startWander();
+    aPerson.startWander(true);
 
     var pAgent = new RoadAgent();
     pAgent.setVisable(true);
@@ -178,7 +182,7 @@ function initializeAgents(){
 function runTest(){
   
  
-    CreateTerrain();
+//    CreateTerrain();
     
     
 }
