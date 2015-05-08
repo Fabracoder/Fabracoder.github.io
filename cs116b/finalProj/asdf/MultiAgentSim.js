@@ -4,8 +4,8 @@
 // disable jslint issue that I dont care about
 var floorHeight = 1000;
 var speed = 100000;
-var cameraX=0;
-var cameraY=2000;
+var cameraX=210;
+var cameraY=100;
 var cameraZ=0;
 
 var minBuildingSize;
@@ -151,27 +151,37 @@ function initializeHelper(){
 	scene.add(helper);
 }
 function initializeAgents(){
+
     
-// 
-//    anAgent = new SimpleAgent(
-//		{
-//			name : "TeaPot",
-//			id : 0
-//		});
+    for(var temp = 0;temp<10;temp++)
+        {
+    makePerson(
+                {
+                    name : "PersonAgent_"+temp.toString(), 
+                    position : new THREE.Vector3(0, 1, 0),
+                    maxWander: Math.random()*6000,
+                    minWander: 100 
+                    
+                })
+            
+        }
+
     
-    
-	aPerson = new PersonAgent(
+makePerson(
 		{
-			name : "John",
-			id : 1,
-			position : new THREE.Vector3(10, 10, 10)
+			name : "Oliver", 
+			position : new THREE.Vector3(0, 0, 0)
             
 		})
     
-	// (name, id, geometry, position, direction, birthdate, wanderlust,money,)
-	aPerson.setVisable(true);
-    aPerson.startWander(true);
-
+ 
+    	makePerson(
+		{
+			name : "Dannielle", 
+			position : new THREE.Vector3(0, 0, 0) 
+		})
+ 
+        
     var pAgent = new RoadAgent();
     pAgent.setVisable(true);
     
