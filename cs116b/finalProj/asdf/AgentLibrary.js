@@ -26,7 +26,7 @@ if (scene === undefined)
 
 	materialsForAgents.push(new THREE.MeshBasicMaterial(
 		{
-			 
+
 		}));
 	materialsForAgents.push(new THREE.MeshPhongMaterial(
 		{
@@ -34,8 +34,6 @@ if (scene === undefined)
 			specular : 0x333333,
 			shininess : 15,
 			map : THREE.ImageUtils.loadTexture("Resources/final_textures/greyc.jpg")
-		// ,specularMap:
-		// THREE.ImageUtils.loadTexture("Resources/final_textures/ea_specular_2048.jpg")
 		}));
 
 	materialsForAgents.push(new THREE.MeshPhongMaterial(
@@ -170,73 +168,12 @@ var RealAgent = function(parameters) //
 	var _position; // location of mesh
 	var _scale; // scaling of mesh
 	var _birthdate; // date created
-    var _height; // height of agent
+	var _height; // height of agent
 	var _wrapper = new THREE.Object3D();
 
-	// this.rays = [_direction];
 	var _caster = new THREE.Raycaster();
 
 	var intersects = _caster.intersectObjects(scene.children);
-	var INTERSECTED;
-//	var collision = function()
-//	{
-//_caster = new THREE.Raycaster();
-//
-//		'use strict';
-//		var collisions, i,
-//		// Maximum distance from the origin before we consider collision
-//		distance = 8,
-//		// Get the obstacles array from our scene
-//		obstacles = scene.children;
-//
-//		// We reset the raycaster to this direction
-//		 _caster.set(_mesh.position, _direction);
-//		// Test if we intersect with any obstacle mesh
-//		collisions = this._caster.intersectObjects(obstacles);
-//		// And disable that direction if we do
-//		if (collisions.length > 0 && collisions[0].distance <= distance)
-//		{
-//			console.log(collisions[0].name);
-//			// TODO: check if it is a building, if so avoid if wanderlust > 50%
-//			// avoid by setting new direction (immediate. not a gradual curve)
-//		}
-//	}
-
-//	if (intersects.length > 0)
-//	{
-//
-//		if (INTERSECTED != intersects[0].object)
-//		{
-//
-//			if (INTERSECTED)
-//				INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-//
-//			INTERSECTED = intersects[0].object; // object intersected with
-//			INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex(); // do
-//			// stuff
-//			// to
-//			// object
-//			// pointed
-//			// at
-//			// (highlight)
-//			INTERSECTED.material.emissive.setHex(0xff0000);
-//
-//		}
-//
-//	}
-//	else
-//	{
-//
-//		if (INTERSECTED)
-//			INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex); // un
-//		// highlight
-//
-//		INTERSECTED = null;
-//
-//	}
-
-	// _wrapper.add(this.getMesh());
-	// this.setMesh(_wrapper);
 
 	// Initializing variables _name, _uuid if provided
 	// This function calls itself after declaring itself
@@ -244,31 +181,26 @@ var RealAgent = function(parameters) //
 	(function()
 	{
 
-
 		_object = new THREE.Object3D(); // higher scoped private obj
-        
+
 		if (parameters !== undefined)
 		{
-            _height = parameters.height | 4;
+			_height = parameters.height | 4;
 			if (parameters.geometry === undefined) // set default
 			{
 				parameters.geometry = new THREE.SphereGeometry(_height, 32, 32);
 			}
-//			if (parameters.material === undefined) // set default
-//			{
-//				parameters.material = materialsForAgents[0];
-//			}
 
 			_mesh = new THREE.Mesh(parameters.geometry, parameters.material);
-            if(parameters.translateY)
-                {
-                        _mesh.translateY(parameters.translateY);
-                }
-            else
-                {
-                    _mesh.translateY(_height / 2); 
-                }
-            
+			if (parameters.translateY)
+			{
+				_mesh.translateY(parameters.translateY);
+			}
+			else
+			{
+				_mesh.translateY(_height / 2);
+			}
+
 			if (parameters.geometryOffset === undefined)
 			{
 				parameters.geometryOffset = 0;
@@ -280,38 +212,19 @@ var RealAgent = function(parameters) //
 			// scale, rotate, translate
 			if (parameters.position !== undefined)
 			{
-				// _setPosition(parameters.position); 
+				// _setPosition(parameters.position);
 				_object.translateX(parameters.position.x);
 				_object.translateY(parameters.position.y);
 				_object.translateZ(parameters.position.z);
 
-				// _object.translateX(parameters.position.x);
-				// _object.translateY(parameters.position.y);
-				// _object.translateZ(parameters.position.z);
 			}
-			// else
-			// {
-			// _position = new THREE.Vector3(0, 0, 0);
-			// //not needed as it defaults to 0,0,0 anyway
-			// }
+
 			if (parameters.direction !== undefined)
 			{
 				// _mesh.lookAt(parameters.direction);
 				_object.rotateX(parameters.direction.x);
 				_object.rotateY(parameters.direction.y);
 				_object.rotateZ(parameters.direction.z);
-
-				// _direction = direction;
-			}
-			else
-			{
-				// // default direction not needed
-				// _mesh.rotateX(parameters.direction.x);
-				// _mesh.rotateY(parameters.direction.y);
-				// _mesh.rotateZ(parameters.direction.z);
-				// _mesh.lookAt(new THREE.Vector3(0, 0, 1));
-				// .rotateOnAxis ?
-				// (axis.normalized, angleInRadians)
 			}
 
 			if (parameters.birthdate !== undefined)
@@ -326,7 +239,6 @@ var RealAgent = function(parameters) //
 		else
 		{
 			_mesh = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32), materialsForAgents[0]);
-			// _mesh.lookAt(new THREE.Vector3(0, 0, 1));
 			_birthdate = AgentClock.getElapsedTime();
 		}
 
@@ -376,7 +288,8 @@ var RealAgent = function(parameters) //
 	};
 
 	var _translateObject = function(parameters)
-	{ 
+	{
+
 		if (parameters === undefined)
 		{
 			return;
@@ -564,7 +477,12 @@ RealAgent.prototype.constructor = RealAgent;
 // (name, id, geometry, position, direction, birthdate, wanderlust,money,)
 var PersonAgent = function(parameters)
 {
-    var _getNewRND_Vector3 = function(){return  new THREE.Vector3((Math.random() - .5) * 2, 0, (Math.random() - .5) * 2)};
+
+	var _getNewRND_Vector3 = function()
+	{
+
+		return new THREE.Vector3((Math.random() - .5) * 2, 0, (Math.random() - .5) * 2)
+	};
 
 	'use strict';
 	// 
@@ -577,13 +495,18 @@ var PersonAgent = function(parameters)
 	var _isWandering = true; // set to false when residing in a building
 	var _direction; // direction facing
 	var _speed = 1;// speed = feet per update?
-    var _insideBuilding=null;
-	var _directionTime = 
+	var _insideBuilding = null;
+	var _directionTime =
 		{
 			count : 0,
 			newDirection : _getNewRND_Vector3()
 		};
-    var _size = {x:50,y:10,z:50};
+	var _size =
+		{
+			x : 50,
+			y : 10,
+			z : 50
+		};
 
 	function resetDirection(parameters)
 	{
@@ -604,10 +527,10 @@ var PersonAgent = function(parameters)
 			parameters =
 				{
 					name : 'PersonAgent',
-					maxWander : _maxWander = 60*10, // time in seconds, 1
+					maxWander : _maxWander = 60 * 10, // time in seconds, 1
 					// minute
 					// default max;
-					minWander : _minWander = 10*10,
+					minWander : _minWander = 10 * 10,
 					// time in seconds, 1 minute default max;
 
 					geometry : new THREE.SphereGeometry(5, 32, 32),
@@ -615,21 +538,25 @@ var PersonAgent = function(parameters)
 				};
 
 		}
-        else
-            {
-                if(parameters.maxWander=== undefined)
-                    {parameters.maxWander = 60*10;}
-                if(parameters.minWander=== undefined)
-                    {parameters.minWander = 10*10;}
-                
-            }
-        _maxWander=parameters.maxWander;
-        _minWander=parameters.minWander;
+		else
+		{
+			if (parameters.maxWander === undefined)
+			{
+				parameters.maxWander = 60 * 10;
+			}
+			if (parameters.minWander === undefined)
+			{
+				parameters.minWander = 10 * 10;
+			}
+
+		}
+		_maxWander = parameters.maxWander;
+		_minWander = parameters.minWander;
 		if (parameters.wanderlust === undefined)
 		{
 			parameters.wanderlust = (Math.random() * (parameters.maxWander - parameters.minWander)) + parameters.minWander;
 		}
-        		_wanderlust=parameters.wanderlust;
+		_wanderlust = parameters.wanderlust;
 		if (parameters.money === undefined) // money is used to calculate
 		// how
 		// much building/land to settledown
@@ -785,30 +712,36 @@ var PersonAgent = function(parameters)
 				_isWandering = false;
 			}
 
-            _wanderlust = _wanderlust - 1;
+			_wanderlust = _wanderlust - 1;
 		}
 		else
 		{
-        if (  _insideBuilding === null) 
-            {
-                // build house
+			if (_insideBuilding === null)
+			{
+				// build house
 
-                // If on a road, build a house on the road or a connecting road
-                // if in the open, build a house nearby that will fit without
-                // intersection
+				// If on a road, build a house on the road or a connecting road
+				// if in the open, build a house nearby that will fit without
+				// intersection
 
-                var aBuilding = new BuildingAgent({position: this.getMesh().position , buildingSize: _size});
-    //            aBuilding.addResident(this); //TODO: does not work right
-                agentList.push(aBuilding);
-                scene.add(aBuilding.getObject());
-                this.setVisable(false);
-                _insideBuilding = aBuilding; // stops this from building another house , also adds itself to the house
-            }
+				var aBuilding = new BuildingAgent(
+					{
+						position : this.getMesh().position,
+						buildingSize : _size
+					});
+				// aBuilding.addResident(this); //TODO: does not work right
+				agentList.push(aBuilding);
+				scene.add(aBuilding.getObject());
+				this.setVisable(false);
+				_insideBuilding = aBuilding; // stops this from building
+												// another house , also adds
+												// itself to the house
+			}
 		}
 
 		if (_directionTime.count < 0)
 		{
-			_directionTime.newDirection =  _getNewRND_Vector3();
+			_directionTime.newDirection = _getNewRND_Vector3();
 
 			_directionTime.count = 100 * Math.random();
 		}
@@ -819,86 +752,17 @@ var PersonAgent = function(parameters)
 			_directionTime.count -= 1;
 		}
 
-	
-
-		//           
-		//        
-		// var _SettleDown = function()
-		// {
-		// if (_restless - (_lastClockCall - _birthday) < _restless * 0.2)
-		// {
-		// return new THREE.Vector3(1000, 100000, 1000);
-		// }
-		// else
-		// {
-		// // console.log(this.restless-(this.lastClockCall-this.birthday));
-		// }
-		// // check if adequate nearby area can be claimed
-		// // if found then it saves the x,y,z in size as a THREE.Vector3
-		// // to be used
-		// return null;
-		// };
-		//    
-		// var _updateMove = function()
-		// {
-		//
-		// var delta = (clock.getElapsedTime() - this.lastClockCall);
-		// this.lastClockCall = clock.getElapsedTime();
-		//
-		// if (this.visable == false)
-		// {
-		// return
-		// }
-		//
-		// _object.translateX(this.direction.x * delta * 10 * SimulationSpeed);
-		// _object.translateZ(this.direction.z * delta * 10 * SimulationSpeed);
-		// // this.mesh.translateX((Math.random() - 0.5) *2 * delta*30);
-		// // this.mesh.translateZ((Math.random() - 0.5) *2 * delta*30);
-		//
-		// _size = _SettleDown();
-		// if (_size == null)
-		// {
-		// if (_countdownchange < 1)
-		// {
-		// _countdownchange = Math.random() * 1000;
-		// _directionChange = new THREE.Vector3((Math.random() - 0.5) * 3 *
-		// delta, 0, (Math.random() - 0.5) * 3 * delta);
-		//
-		// }
-		// else
-		// {
-		// _direction = this.direction.add(_directionChange);
-		// _direction = this.direction.normalize();
-		// _countdownchange--;
-		// }
-		//
-		// }
-		// else
-		// // create building
-		// {
-		// // check if nearby road, and build adjacent is so
-		// // console.log(this);
-		// console.log(_object.position);
-		// // console.log(this.size);
-		// // var aBuilding = new BuildingAgent(this.mesh.position, this.size);
-		//
-		// // agentList.push(aBuilding);
-		// // scene.add(aBuilding.mesh);
-		// _setVisable(false);
-		// }
-		//
-		// // console.log(directionChange.x +":" +directionChange.z + " :->: " +
-		// // this.direction.x + " : " + this.direction.z);
-		//
-		// };
-
 	};
 
-    var _getWanderLust = function (){return _wanderlust;};
+	var _getWanderLust = function()
+	{
+
+		return _wanderlust;
+	};
 	this.startWander = _startWander;
 	this.setWanderParams = _setWanderParams;
 	this.classSpecificUpdate = _classSpecificUpdate; // runs this on at end
-    this.getWanderLust = _getWanderLust;
+	this.getWanderLust = _getWanderLust;
 	// of update function
 	// for obj
 
@@ -907,8 +771,6 @@ var PersonAgent = function(parameters)
 };
 PersonAgent.prototype = new RealAgent();
 PersonAgent.prototype.constructor = PersonAgent;
-
-
 
 // parameters
 // {name,id,geometry,material,birthday,direction,position,scale,mesh,
@@ -944,21 +806,26 @@ var BuildingAgent = function(parameters)
 	if (parameters.buildingSize === undefined)
 	{
 		parameters.buildingSize = new THREE.Vector3(50, 20, 50); // default
-        parameters.geometryOffset = 25;// from the road
-        parameters.translateY =    parameters.buildingSize.y/2; // to make level with the world
- 
+		parameters.geometryOffset = 25;// from the road
+		parameters.translateY = parameters.buildingSize.y / 2; // to make level
+																// with the
+																// world
+
 		// size
 	}
 	if (parameters.geometry === undefined)
 	{
 		parameters.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z);
-		parameters.geometryOffset = parameters.buildingSize.z/2 ; // from the road
-        parameters.translateY =    parameters.buildingSize.y/2;// to make level with the world
+		parameters.geometryOffset = parameters.buildingSize.z / 2; // from the
+																	// road
+		parameters.translateY = parameters.buildingSize.y / 2;// to make level
+																// with the
+																// world
 	}
-//    if(parameters.height === undefined)
-//        {
-//                parameters.height = parameters.buildingSize.y/2;
-//        }
+	// if(parameters.height === undefined)
+	// {
+	// parameters.height = parameters.buildingSize.y/2;
+	// }
 	var _generatePortals = function(positions)
 	{
 
@@ -999,14 +866,14 @@ var makeBuilding = function(parameters)
 
 var makePerson = function(parameters)
 {
-    'use strict';
-    var aPerson = new PersonAgent(parameters);
-    	// (name, id, geometry, position, direction, birthdate, wanderlust,money,)
+
+	'use strict';
+	var aPerson = new PersonAgent(parameters);
+	// (name, id, geometry, position, direction, birthdate, wanderlust,money,)
 	aPerson.setVisable(true);
-    aPerson.startWander(true);
+	aPerson.startWander(true);
 	return aPerson;
 };
-
 
 // roads grow
 // initially as a dirt path ( 1 lane )
@@ -1022,7 +889,7 @@ var makePerson = function(parameters)
 // grows )
 //
 // RoadAgent
-// RoadIntersectionAgent 
+// XroadAgent = RoadIntersectionAgent
 var RoadAgent = function(parameters)
 {
 
@@ -1031,7 +898,7 @@ var RoadAgent = function(parameters)
 	var _laneCount;
 	var _laneWidth;
 	var _roadLength;
-
+    var _isGrowing;
 	if (parameters === undefined)
 	{
 		parameters =
@@ -1062,8 +929,6 @@ var RoadAgent = function(parameters)
 	var _rLength = 500;
 	parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight / 10, _rLength);
 	parameters.geometryOffset = _rLength / 2;
-	// console.log(_rWidth + "+" + _rHeight + "+" + _rLength);
-	// parameters.direction = new THREE.Vector3(0,0,0);
 	parameters.material = materialsForAgents[2];
 
 	RealAgent.call(this, parameters);
@@ -1075,12 +940,37 @@ var RoadAgent = function(parameters)
 		parameters.geometryOffset = value / 2;
 		parameters.geometry = new THREE.BoxGeometry(_rWidth, _rHeight / 10, _rLength);
 		_m(parameters);
-		// _object = getObject();
-		// _object.updateGeometry(parameters);
+	};
+
+	var _update = function()
+	{
+
+		if (_isGrowing)
+		{
+			_growLength(1);
+			// chance to spawn XroadAgent
+		}
 	};
 	var _m = this.updateMesh;
 	this.growLength = _growLength;
+//	this.classSpecificUpdate = _update();
+	 
 };
 
 RoadAgent.prototype = new RealAgent();
 RoadAgent.prototype.constructor = RoadAgent;
+
+// this agent represents the crossroads. It is a short cylinder
+// roads can connect to it from all angles
+// but it has a 6 road max?
+//
+var XRoadAgent = function(parameters)
+{
+
+	RealAgent.call(parameters);
+};
+XRoadAgent.prototype = new RealAgent();
+XRoadAgent.prototype.constructor = XRoadAgent;
+/* 
+
+ */
