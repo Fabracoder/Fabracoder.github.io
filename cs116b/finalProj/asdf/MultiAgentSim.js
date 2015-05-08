@@ -10,6 +10,7 @@ var cameraZ=0;
 
 var minBuildingSize;
 
+
 var MARGIN = 10;
 var SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
 var SCREEN_WIDTH = window.innerWidth - MARGIN * 2;
@@ -149,20 +150,18 @@ function initializeHelper(){
 	}
 
 	scene.add(helper);
-}
-function initializeAgents(){
-
-    
+};
+function initializeAgents(){ 
     for(var temp = 0;temp<10;temp++)
-        {
-    makePerson(
-                {
+        { 
+            
+            makePerson({
                     name : "PersonAgent_"+temp.toString(), 
                     position : new THREE.Vector3(0, 1, 0),
                     maxWander: Math.random()*6000,
-                    minWander: 100 
-                    
-                })
+                    minWander: 100  
+                });
+  
             
         }
 

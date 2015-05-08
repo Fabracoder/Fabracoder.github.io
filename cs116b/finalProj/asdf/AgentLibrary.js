@@ -448,11 +448,20 @@ var RealAgent = function(parameters) //
 	};
 
 	var _classSpecificUpdate = function(parameters)
-	{
-
+	{ 
 		// to be overrided
 	};
 
+     var _setAgentUpdate = function(func) {
+         if(func===undefined)
+             {
+                 _classSpecificUpdate = _classSpecificUpdate|| function(params){};
+             }
+         else
+             {       _classSpecificUpdate = func;  }
+
+     };
+    
 	this.getPosition = _getPosition;
 	this.setPosition = _setPosition;
 	this.translateAgent = _translateObject;
@@ -460,14 +469,15 @@ var RealAgent = function(parameters) //
 	this.getMesh = _getMesh;
 	this.setMesh = _setMesh;
 	this.updateMesh = _updateMesh;
-
+    this.classSpecificUpdate = _classSpecificUpdate;
+//    this.setAgentUpdate = _setAgentUpdate ;
+    
 	this.getObject = _getObject;
 	this.setObject = _setObject;
 	this.getBirthdate = _getBirthdate;
 	this.setBirthdate = _setBirthdate;
 	this.setVisable = _setVisable;
-	this.updateAgent = _update;
-	this.classSpecificUpdate = _classSpecificUpdate;
+	this.updateAgent = _update; 
 
 	realAgentList.push(this);
 };
@@ -481,7 +491,7 @@ var PersonAgent = function(parameters)
 	var _getNewRND_Vector3 = function()
 	{
 
-		return new THREE.Vector3((Math.random() - .5) * 2, 0, (Math.random() - .5) * 2)
+		return new THREE.Vector3((Math.random() - 0.5) * 2, 0, (Math.random() - 0.5) * 2)
 	};
 
 	'use strict';
@@ -762,11 +772,12 @@ var PersonAgent = function(parameters)
 	this.startWander = _startWander;
 	this.setWanderParams = _setWanderParams;
 	this.classSpecificUpdate = _classSpecificUpdate; // runs this on at end
+//    this.setAgentUpdate=(_classSpecificUpdate);
 	this.getWanderLust = _getWanderLust;
 	// of update function
 	// for obj
 
-	setWanderlust: _setWanderlust;
+	this.setWanderlust = _setWanderlust;
 
 };
 PersonAgent.prototype = new RealAgent();
@@ -863,11 +874,11 @@ var makeBuilding = function(parameters)
 
 	'use strict';
 };
-
+ 
 var makePerson = function(parameters)
-{
-
+{ 
 	'use strict';
+  
 	var aPerson = new PersonAgent(parameters);
 	// (name, id, geometry, position, direction, birthdate, wanderlust,money,)
 	aPerson.setVisable(true);
@@ -953,7 +964,7 @@ var RoadAgent = function(parameters)
 	};
 	var _m = this.updateMesh;
 	this.growLength = _growLength;
-//	this.classSpecificUpdate = _update();
+	this.classSpecificUpdate = _update();
 	 
 };
 
