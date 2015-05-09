@@ -444,8 +444,9 @@ var RealAgent = function(parameters) //
 			}
 
 		}
+        
 		this.classSpecificUpdate(parameters);
-	};
+	}
 
 	var _classSpecificUpdate = function(parameters)
 	{ 
@@ -479,11 +480,11 @@ var RealAgent = function(parameters) //
 	this.setVisable = _setVisable;
 	this.updateAgent = _update; 
 
+    classSpecificUpdate = function(){};
 	realAgentList.push(this);
 };
 RealAgent.prototype = new SimpleAgent();
 RealAgent.prototype.constructor = RealAgent;
-
 // (name, id, geometry, position, direction, birthdate, wanderlust,money,)
 var PersonAgent = function(parameters)
 {
