@@ -284,6 +284,22 @@ AGENT.PersonAgent.update = function (parameters)
    };
 
 AGENT.BuildingAgent  = function(parameters) { };
+
+ AGENT.BuildingAgent.initialize = function(parameters)
+ {
+     parameters = AGENT.RealAgent.initialize(parameters); 
+     parameters =parameters || {name:'BuildingAgent'+parameters.uuid ,type:'BuildingAgent'};
+     parameters.agentUpdate =  AGENT.BuildingAgent.update;
+    
+     return parameters;
+ };
+
+ AGENT.BuildingAgent.initialize = function(parameters)
+ {
+   return parameters;  
+ };
+
+
 AGENT.XRoadAgent =   function(parameters) { };
 AGENT.RoadAgent =  function(parameters) { };
 /////////////////
