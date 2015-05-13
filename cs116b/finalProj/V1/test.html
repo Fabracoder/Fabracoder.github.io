@@ -1,0 +1,81 @@
+var wd = window;
+if (!wd.requestAnimationFrame) {
+    wd.requestAnimationFrame =
+        wd.webkitRequestAnimationFrame ||
+        wd.mozRequestAnimationFrame    ||
+        wd.oRequestAnimationFrame      ||
+        wd.msRequestAnimationFrame     ||
+        function(cb, element) {wd.setTimeout(cb, 1000 / 30);};
+}
+
+var ctnEl = document.getElementById('ctn');
+var camera, scene, renderer;
+var cube, cubeRotSpd = 0;
+
+var winDims = [ctnEl.offsetWidth, ctnEl.offsetHeight];
+var winHalfW = winDims[0] / 2;
+
+function init() {
+    //renderer = new THREE.CanvasRenderer();
+    renderer = new THREE.WebGLRenderer();
+    
+    renderer.setSize(winDims[0], winDims[1]);
+
+    scene = new THREE.Scene();
+        
+    camera = new THREE.PerspectiveCamera(70, winDims[0] / winDims[1], 1, 1000);
+    camera.position.y = 250;
+    camera.position.z = 500;
+    camera.lookAt(new THREE.Vector3(0, 0, 0));    
+    scene.add(camera);
+    
+
+    
+    // objects
+    var geo = new THREE.Geometry();
+    geo.vertices.push(new THREE.Vertex(
+        new THREE.Vector3(   0, 100, 0)));
+    geo.vertices.push(new THREE.Vertex(
+        new THREE.Vector3(-120,-100, 0)));
+    geo.vertices.push(new THREE.Vertex(
+        new THREE.Vector3( 120,-100, 0)));
+    geo.faces.push( new THREE.Face3(0, 1, 2));
+    
+    /*geo.computeCentroids();
+    geo.computeFaceNormals();*/
+    
+    cube = new THREE.Mesh(
+        geo,
+        new THREE.MeshBasicMaterial({
+            color:              0xFF00FF,
+            wireframe:          true,
+            wireframeLinewidth: 3
+        })
+    );
+    cube.doubleSided = true;
+    cube.overdraw = true;
+    scene.add(cube);
+    
+    ctnEl.appendChild(renderer.domElement);
+    
+    // events
+    document.addEventListener('keydown', onDown, false);
+}
+
+function onDown(event) {
+    var k = event.keyCode;
+    cubeRotSpd += (k === 37) ? 0.02 : -0.02;
+}
+
+function animate() {
+    cube.rotation.y += cubeRotSpd;
+    requestAnimationFrame(animate);
+    render();
+}
+            
+function render() {
+    renderer.render(scene, camera);
+}
+
+init();
+animate();
