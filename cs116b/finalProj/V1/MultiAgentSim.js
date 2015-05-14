@@ -5,7 +5,7 @@
 var floorHeight = 1000;
 var speed = 100000;
 var cameraX=0;
-var cameraY=100;
+var cameraY=1000;
 var cameraZ=0;
 
 var minBuildingSize;
@@ -105,7 +105,7 @@ function cameraInit(){
      initializeAgents();
  //    runTest();
         
-     initializeHelper();
+//     initializeHelper();
      
      renderer = new THREE.WebGLRenderer();
      renderer.setPixelRatio(window.devicePixelRatio);
@@ -152,39 +152,49 @@ function initializeHelper(){
 	scene.add(helper);
 };
 function initializeAgents(){ 
-//    for(var temp = 0;temp<10;temp++)
+        var pa,temp,tmp;
+    for(  temp = 0;temp<50;temp++)
+        {  
+            pa = AGENT.PersonAgent.initialize(
+                {
+                    maxWander: Math.random()*6000, 
+                    minWander: 100
+                }); 
+            AGENT.setVisable(pa);  
+            
+        }
+//     for(var temp = 0;temp<10;temp++)
 //        { 
-//            
-//            makePerson({
-//                    name : "PersonAgent_"+temp.toString(), 
-//                    position : new THREE.Vector3(0, 1, 0),
-//                    maxWander: Math.random()*6000,
-//                    minWander: 100  
-//                });
-//  
-//            
+//            pa = AGENT.BuildingAgent.initialize({position:AGENT.getRND_V3_101().multiplyScalar(1000)});
+//            AGENT.setVisable(pa); 
 //        }
 
-    var pa = AGENT.PersonAgent.initialize();
-    AGENT.setVisable(pa);
+        for(tmp=-3 ;tmp<3;tmp++)
+            {
+                for(temp=-3;temp<3;temp++)
+                    {
+                        if(temp==-3 || tmp ==-3)
+                        { 
+                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(50*tmp ,0,50*temp)});
+                         AGENT.setVisable(pa); 
+                        }
+            
+                    }
+            }
     
+            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150 ,0,-110)});
+            AGENT.setVisable(pa); 
+            
+            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,-55)});
+            AGENT.setVisable(pa); 
+
+            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,45)});
+            AGENT.setVisable(pa);   
+            
+            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,100)});
+            AGENT.setVisable(pa);   
     
-//    
-//makePerson(
-//		{
-//			name : "Oliver", 
-//			position : new THREE.Vector3(0, 0, 0)
-//            
-//		}).setVisable(true);
-//    
-// 
-//    	makePerson(
-//		{
-//			name : "Dannielle", 
-//			position : new THREE.Vector3(0, 0, 0) 
-//		})
-// 
-//        
+ 
 //    var pAgent = new RoadAgent({direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
 //    pAgent.setVisable(true);
 //    
@@ -232,11 +242,7 @@ function degreeToRadian(value)
 
      controls.movementSpeed = speed * (delta);
      controls.update(delta);
-//     for(var i =0;i<AgentLib.agentList.activeAgents.length;i++)
-//         {
-//             AgentLib.agentList.activeAgents[i].updateAgent();
-//         }
-//     
+ 
      for(var k =0 ;k<AGENT.AgentPList.length;k++)
          {
              AGENT.AgentPList[k].agentUpdate(AGENT.AgentPList[k]);
