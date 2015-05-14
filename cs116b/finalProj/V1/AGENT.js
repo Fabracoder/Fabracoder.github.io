@@ -342,10 +342,10 @@ AGENT.RealAgent =
         for(var tem =0;tem<parameters.rays.length;tem++)
             {
             // We reset the raycaster to this direction
-                AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[tem],0,parameters.collisionDistance);
-                
+                AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[tem] );
+                AGENT.RealAgent.rayCaster.far = parameters.collisionDistance;
             // Test if we intersect with any obstacle mesh
-            collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.getActiveMeshes(),true);
+            collisions = AGENT.RealAgent.rayCaster.intersectObjects(parameters.scene.children,true);
             parameters.collisionList.push(collisions);// double array.
             }
         
