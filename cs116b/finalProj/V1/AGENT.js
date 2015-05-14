@@ -312,8 +312,8 @@ AGENT.RealAgent =
         parameters.collisionList =
             []; 
      
-            // We reset the raycaster to this direction
-            AGENT.RealAgent.rayCaster.set(((new THREE.Vector3(0,3,0)).add(parameters.outerObject.position)), parameters.direction);
+            // We reset the raycaster to this direction at a height of 1
+            AGENT.RealAgent.rayCaster.set(((new THREE.Vector3(0,1,0)).add(parameters.outerObject.position)), parameters.direction);
  
             // Test if we intersect with any obstacle mesh
             collisions = AGENT.RealAgent.rayCaster.intersectObjects(parameters.scene.children);
