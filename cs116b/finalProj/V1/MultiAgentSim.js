@@ -236,14 +236,15 @@ function degreeToRadian(value)
 
  function render() {
 
-     var delta = clock.getDelta();
+     var delta = clock.getDelta(),k;
 
      controls.movementSpeed = speed * (delta);
      controls.update(delta);
  
-     for(var k =0 ;k<AGENT.AgentPList.length;k++)
+     for(k =0 ;k<AGENT.AgentPList.length;k++)
          {
              AGENT.AgentPList[k].agentUpdate(AGENT.AgentPList[k]);
+             console.log("_"+k);
          }
      if(helper!=null)
          {
