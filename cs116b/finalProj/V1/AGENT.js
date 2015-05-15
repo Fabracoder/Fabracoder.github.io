@@ -378,7 +378,7 @@ AGENT.RealAgent.collisionBuilding = function(parameters, useSize)
 		return;
 	}
 
-	var i,collision;
+	var i,collisions;
 
 	// Maximum distance from the origin before we consider collision
 	parameters.collisionDistance = parameters.collisionDistance || 32;
@@ -399,7 +399,7 @@ AGENT.RealAgent.collisionBuilding = function(parameters, useSize)
 		for (i = 0; i < this.rays.length; i += 1)
 		{
 			// We reset the raycaster to this direction
-			AGENT.RealAgent.rayCaster.set(parameters.outsideObject.position, parameters.rays);
+			AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays);
 			// Test if we intersect with any obstacle mesh
 			collisions = AGENT.RealAgent.rayCaster.intersectObjects(parameters.scene.children);
 			parameters.collisionList.push(collisions);// double array.
@@ -415,10 +415,7 @@ AGENT.RealAgent.collisionBuilding = function(parameters, useSize)
 // ///////////
 // PersonAgent
 // ///////////
-// ///////////
-// PersonAgent
-// ///////////
-
+ 
 AGENT.PersonAgent = function(parameters)
 {
 'use strict';
@@ -559,33 +556,8 @@ AGENT.PersonAgent.update = function(parameters)
 	{
 		if (parameters.insideBuilding === null)
 		{
-			parameters.rays = AGENT.RealAgent.rays;
-			AGENT.RealAgent.collisionBuilding(parameters, true); // the second
-															// argument
-															// indicates to
-															// check given
-															// buildingsize
-
-			// XKX
-			// (parameters.collisionList[0][0].object.owner.type=="BuildingAgent"
-			// )
-
-			// check space,
-			// if not buildable, reduce size until you reach minimum size
-			// if at minimum and does not fit, then reduce 30 from wanderTime
-
-			parameters.wanderTime = 0;
-			temp = AGENT.BuildingAgent.initialize(
-				{
-					move : parameters.outerObject.position,
-					buildingSize : parameters.buildingSize
-				});
-			temp.residents.push(parameters);
-			parameters.insideBuilding = temp;
-			AGENT.setVisable(temp);
-			parameters.visable = false;
-			AGENT.setVisable(parameters);
-
+                parameters.wanderTime = 0;
+                AGENT.BuildingAgent.tryMakeBuilding(parameters);
 		} 
 		// generate random size
 		// check if I can build here
@@ -643,7 +615,7 @@ AGENT.BuildingAgent.initialize = function(parameters)
 
 AGENT.BuildingAgent.update = function(parameters)
 {
-'use strict';
+    'use strict';
 	var temp = Math.random(), leng, pers;
 	if (parameters.residents.length > parameters.maxResidents)
 	{
@@ -682,6 +654,39 @@ AGENT.BuildingAgent.update = function(parameters)
 
 };
 
+AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
+{
+        if(parameters)
+        {
+            parameters.rays = AGENT.RealAgent.rays;
+            AGENT.RealAgent.collisionBuilding(parameters );  
+
+            // (parameters.collisionList[0][0].object.owner.type=="BuildingAgent"
+            // )
+
+            // check space,
+            // if not buildable, reduce size until you reach minimum size
+            // if at minimum and does not fit, then reduce 30 from wanderTime         
+
+            if(parameters.buildingSize===undefined)
+                {
+                    parameters.buildingSize = new THREE.Vector3(50+(~~(Math.random()*10))*10,((~~(Math.random()*4))*10)+10 + Math.random()/10,(50+(~~(Math.random()*10))*10));
+                }
+            
+            console.log(parameters.buildingSize.x + ":"+parameters.buildingSize.y  + ":"+parameters.buildingSize.z + ":");
+
+            temp = AGENT.BuildingAgent.initialize(
+                {
+                    move : new THREE.Vector3 (parameters.outerObject.position.x,parameters.outerObject.position.y,parameters.outerObject.position.z),
+                    buildingSize : new THREE.Vector3(parameters.buildingSize.x,parameters.buildingSize.y,parameters.buildingSize.z)
+                });
+            temp.residents.push(parameters);
+            parameters.insideBuilding = temp;
+            AGENT.setVisable(temp);
+            parameters.visable = false;
+            AGENT.setVisable(parameters);
+        }
+}
 AGENT.XRoadAgent = function(parameters)
 {
 'use strict';
@@ -690,3 +695,4 @@ AGENT.RoadAgent = function(parameters)
 {
 'use strict';
 };
+
