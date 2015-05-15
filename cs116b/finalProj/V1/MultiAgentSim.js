@@ -153,7 +153,7 @@ function initializeHelper(){
 };
 function initializeAgents(){ 
         var pa,temp,tmp;
-    for(  temp = 0;temp<1;temp++)
+    for(  temp = 0;temp<5;temp++)
         {  
             pa = AGENT.PersonAgent.initialize(
                 {
@@ -161,6 +161,8 @@ function initializeAgents(){
                     minWander: 100
                 }); 
             AGENT.setVisable(pa);  
+            
+            
             
         }
 //     for(var temp = 0;temp<10;temp++)
@@ -190,9 +192,7 @@ function initializeAgents(){
 
             pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,45)});
             AGENT.setVisable(pa);   
-             
-    
- 
+
 //    var pAgent = new RoadAgent({direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
 //    pAgent.setVisable(true);
 //    

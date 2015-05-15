@@ -29,6 +29,22 @@ var AGENT =
             }
         return a;
     }
+    
+ 
+    
+    AGENT.updateActiveMeshes = function()
+    {
+        var i;
+        AGENT.activeMeshes=[];
+        
+        for(i=0;i<AGENT.AgentPList.length;i++)
+            {
+                if(AGENT.AgentPList[i].visable)
+                {AGENT.activeMeshes.push(AGENT.AgentPList[i].outerObject);}
+            }
+        
+    };
+    
     AGENT.getRND_V3_101 = function()
     {
 
@@ -281,6 +297,7 @@ AGENT.RealAgent =
 			new THREE.Vector3(-1, 0, -1), new THREE.Vector3(-1, 0, 0), new THREE.Vector3(-1, 0, 1)
 	];
     AGENT.RealAgent.rayCaster = new THREE.Raycaster();
+    AGENT.RealAgent.rayCaster.far = 32;
  
     AGENT.RealAgent.collisionForward = function(parameters)
     {
@@ -316,7 +333,10 @@ AGENT.RealAgent =
             AGENT.RealAgent.rayCaster.set(((new THREE.Vector3(0,1,0)).add(parameters.outerObject.position)), parameters.direction);
  
             // Test if we intersect with any obstacle mesh
-            collisions = AGENT.RealAgent.rayCaster.intersectObjects(parameters.scene.children);
+       
+                AGENT.updateActiveMeshes();
+           
+            collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes,true);
             parameters.collisionList.push(collisions);// double array.
             // example : parameters.collisionList[0].length
             // example : parameters.collisionList[0][0].distance
@@ -478,7 +498,7 @@ AGENT.PersonAgent.update = function(parameters)
             while (parameters.collisionList[0].length>0)
             {
                 
-              if(parameters.collisionList[0][0].owner.type=="BuildingAgent" )//&& (parameters.wanderLust-parameters.wanderTime)<(parameters.wanderLust*0.8))
+              if(parameters.collisionList[0][0].object.owner.type=="BuildingAgent" )//&& (parameters.wanderLust-parameters.wanderTime)<(parameters.wanderLust*0.8))
                   {
                       parameters.isWandering = false;
                       parameters.insideBuilding = parameters.collisionList[0][0].owner;
@@ -492,6 +512,7 @@ AGENT.PersonAgent.update = function(parameters)
                   AGENT.RealAgent.collisionForward(parameters);
             }
         }
+        parameters.move = parameters.direction;
 		AGENT.RealAgent.moveObject(parameters);
 
 		if (parameters.wanderLust - parameters.wanderTime < 0)
@@ -505,7 +526,7 @@ AGENT.PersonAgent.update = function(parameters)
 		{
 			parameters.directionTime.newDirection = AGENT.getRND_V3_101();
 			parameters.directionTime.count = 100 * Math.random();
-			parameters.directionTime.delta = Math.random() * 0.8;
+			parameters.directionTime.delta = Math.random() * 0.0;
 
 		}
 		else
@@ -514,12 +535,15 @@ AGENT.PersonAgent.update = function(parameters)
 			parameters.direction = parameters.direction.normalize();
 			parameters.directionTime.count -= 1;
 		}
-
 	}
 	else
 	{
         if(parameters.insideBuilding==null)
             {
+                 
+                // check space, 
+                // if not buildable, reduce size until you reach minimum size
+                // if at minimum and does not fit, then reduce 30 from wanderTime
                 
             parameters.wanderTime = 0;
             temp = AGENT.BuildingAgent.initialize({move:parameters.outerObject.position,buildingSize:parameters.buildingSize});
