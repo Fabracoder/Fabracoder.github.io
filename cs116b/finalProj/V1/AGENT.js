@@ -29,7 +29,7 @@ AGENT.updateParams = function (a, b)
 	}
 	if (b !== undefined)
     {
-        for (  attrname in b)
+        for ( attrname in b)
 		{
 			a[attrname] = b[attrname];
 		}
@@ -43,14 +43,14 @@ AGENT.updateActiveBuildings = function()
 	var i;
     if(AGENT.activeMeshes === undefined)
         {
-            	AGENT.activeMeshes = []; 
+            AGENT.activeMeshes = []; 
         }
     else
-        AGENT.activeMeshes.length = 0;
+        {AGENT.activeMeshes.length = 0;}
 
 	for (i = 0; i < AGENT.AgentPList.length; i=i+1)
 	{
-		if (AGENT.AgentPList[i].visable && AGENT.AgentPList[i].type =='BuildingAgent')
+		if (AGENT.AgentPList[i].visable && AGENT.AgentPList[i].type ==='BuildingAgent')
 		{
 			AGENT.activeMeshes.push(AGENT.AgentPList[i].outerObject);
 		}
@@ -64,14 +64,14 @@ AGENT.updateActivePersons = function()
 	var i;
     if(AGENT.activePersons === undefined)
         {
-            	AGENT.activePersons = []; 
+            AGENT.activePersons = []; 
         }
     else
-        AGENT.activePersons.length = 0;
+        {AGENT.activePersons.length = 0;}
 
 	for (i = 0; i < AGENT.AgentPList.length; i=i+1)
 	{
-		if (AGENT.AgentPList[i].visable && AGENT.AgentPList[i].type =='PersonAgent')
+		if (AGENT.AgentPList[i].visable && AGENT.AgentPList[i].type ==='PersonAgent')
 		{
 			AGENT.activePersons.push(AGENT.AgentPList[i].outerObject);
 		}
@@ -94,6 +94,7 @@ AGENT.setVisable = function(parameters)
  'use strict';
 	parameters = parameters ||
 		{};
+    //parameters.visable.writable= true;
 	if (parameters.visable === undefined)
 	{
 		parameters.visable = true;
@@ -109,7 +110,7 @@ AGENT.setVisable = function(parameters)
 
 	if (parameters.scene !== undefined)
 	{
-		if (parameters.scene.type == 'Scene')
+		if (parameters.scene.type === 'Scene')
 		{
 			if (parameters.outerObject !== undefined)
 			{
@@ -229,7 +230,7 @@ AGENT.RealAgent.initialize = function(parameters)
 
     AGENT.updateParams(parameters,{ name : 'RealAgent' + parameters.uuid, type : 'RealAgent' });
     
- 	parameters.rays = parameters.rays || AGENT.RealAgent.rays;
+    parameters.rays = parameters.rays || AGENT.RealAgent.rays;
 	parameters.geometry = parameters.geometry || new THREE.SphereGeometry(5, 32, 32);
 	parameters.geometry.computeBoundingBox();
 	// random color
@@ -244,11 +245,11 @@ AGENT.RealAgent.initialize = function(parameters)
 
 	parameters.outerObject = parameters.outerObject || new THREE.Object3D();
 	parameters.outerObject.owner = parameters;
-	if (parameters.outerObject.children.indexOf(parameters.innerMesh) == -1)
+	if (parameters.outerObject.children.indexOf(parameters.innerMesh) === -1)
 	{
 		parameters.outerObject.add(parameters.innerMesh);
 	}
-
+    parameters.visable = parameters.visable || true;
 	parameters.birthdate = parameters.birthdate || AGENT.Clock.getElapsedTime();
 	parameters.direction = parameters.direction || AGENT.getRND_V3_101();
 	parameters.move = parameters.move || parameters.position;
@@ -260,7 +261,7 @@ AGENT.RealAgent.initialize = function(parameters)
 	return parameters;
 };
 
-AGENT.RealAgent.resetInnerMeshOffset = function(parameters,resetOrigin)
+AGENT.RealAgent.resetInnerMeshOffset = function(parameters)
 {
  'use strict';
 	parameters.innerMesh.geometry.computeBoundingBox();
@@ -272,10 +273,12 @@ AGENT.RealAgent.resetInnerMeshOffset = function(parameters,resetOrigin)
     parameters.innerMesh.translateZ(-parameters.innerMesh.position.z);
     
  
+    if(parameters.resetOrigin===undefined)
+    {
         dist.subVectors((parameters.innerMesh.geometry.boundingBox.max), (parameters.innerMesh.geometry.boundingBox.min));
         parameters.innerMesh.translateY(dist.y / 2); // even to floor
         parameters.innerMesh.translateZ(-dist.z / 2);// brings orgin to front
- 
+    }
     
     return parameters;
 };
@@ -334,9 +337,9 @@ AGENT.RealAgent.moveObject = function(parameters)
 	}
 	if (parameters.spin !== undefined)
 	{
-		if (spin.axis !== undefined && spin.rotation !== undefined)
+		if (parameters.spin.axis !== undefined && parameters.spin.rotation !== undefined)
 		{
-			parameters.outerObject.rotate(spin.axis, spin.rotation);
+			parameters.outerObject.rotate(parameters.spin.axis, parameters.spin.rotation);
 			parameters.spin = undefined;
 		}
 	}
@@ -363,7 +366,7 @@ AGENT.RealAgent.collisionRaw = function(parameters,yOffset)
 //    parameters.raydistances;
  
 	var i, collisions;
- 	if (parameters === undefined)
+    if (parameters === undefined)
 	{
 		return;
 	}
@@ -379,14 +382,14 @@ AGENT.RealAgent.collisionRaw = function(parameters,yOffset)
         {
             return;
         }
-     if(parameters.rays.length!=parameters.rayDistances.length)
+     if(parameters.rays.length!==parameters.rayDistances.length)
          {
              THREE.warn("RayArray and RayDistanceArray do not match length");
              return;
          }
     yOffset = yOffset || 0;
-    	// Maximum distance from the origin before we consider collision 
-//    AGENT.RealAgent.rayCaster.far = parameters.collisionDistance  || 32;
+    // Maximum distance from the origin before we consider collision 
+    //    AGENT.RealAgent.rayCaster.far = parameters.collisionDistance  || 32;
 	// Get the obstacles array from our world
 	// scene.children
 
@@ -394,7 +397,7 @@ AGENT.RealAgent.collisionRaw = function(parameters,yOffset)
 	parameters.collisionList = []; 
 	// We reset the raycaster to this direction at a height of 1
     
-    for(i=0;i<parameters.rays.length;i++)
+    for(i=0;i<parameters.rays.length;i=i+1)
     {
         AGENT.RealAgent.rayCaster.far = parameters.rayDistances[i] || 32;
         AGENT.RealAgent.rayCaster.set(((new THREE.Vector3(0, yOffset, 0)).add(parameters.outerObject.position)), parameters.rays[i]);
@@ -408,7 +411,7 @@ AGENT.RealAgent.collisionRaw = function(parameters,yOffset)
 	// example : parameters.collisionList[0][0].distance
 
 	return collisions;
-}
+};
  
 // ///////////
 // PersonAgent
@@ -475,7 +478,7 @@ AGENT.PersonAgent.initialize = function(parameters)
 		parameters.direction = Vector3 || AGENT.getRND_V3_101();
 		return parameters;
 	};
-    parameters.innerMesh.geometry.computeBoundingSphere()
+    parameters.innerMesh.geometry.computeBoundingSphere();
     parameters.boundingSphere = parameters.innerMesh.geometry.boundingSphere;
 	return parameters;
 
@@ -659,8 +662,7 @@ AGENT.BuildingAgent.update = function(parameters)
 				parameters.buildingSize.add(new THREE.Vector3(0, 0, 10));
 			}// grow
 		}
-		parameters.innerMesh.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z, 5, 5, 5);
-		AGENT.RealAgent.resetInnerMeshOffset(parameters,true);
+		parameters.innerMesh.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z, 5, 5, 5); 
         AGENT.RealAgent.resetInnerMeshOffset(parameters);
         
 		leng = parameters.residents.length * temp; // random number of people
@@ -678,8 +680,8 @@ AGENT.BuildingAgent.update = function(parameters)
 		parameters.maxResidents = parameters.maxResidents * 2;
 	}
     
-    babies = ~~(parameters.residents.length/2);
-    if(babies==0)
+    babies = (Math.floor(parameters.residents.length/2));
+    if(babies===0)
                 {
                     babies = 0.85;
                 }
@@ -715,7 +717,7 @@ AGENT.BuildingAgent.update = function(parameters)
 };
 
 AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
-{
+{'use strict';
     var temp,i,k,diagValue,flag ;
     AGENT.updateActiveBuildings();
         if(parameters)
@@ -733,7 +735,7 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
                 if(parameters.buildingSize===undefined)
                 {
                     parameters.buildingSize = 
-                     new THREE.Vector3(50+(~~(Math.random()*10))*10,((~~(Math.random()*4))*10)+10 + Math.random()/10,(50+(~~(Math.random()*10))*10));
+                     new THREE.Vector3(50+(Math.floor(Math.random()*10))*10,((Math.floor(Math.random()*4))*10)+10 + Math.random()/10,(50+(Math.floor(Math.random()*10))*10));
                 }
                 else // reduce size
                 {
@@ -764,14 +766,14 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
                 parameters.rayDistances = [parameters.buildingSize.z/2,diagValue,parameters.buildingSize.x/2,diagValue,parameters.buildingSize.z/2,diagValue,parameters.buildingSize.x/2,diagValue]; 
                  AGENT.RealAgent.collisionRaw(parameters, 0.5); 
                  if(parameters.collisionList!==undefined)
-                for(k=0;k<parameters.collisionList.length;k++)
+                {for(k=0;k<parameters.collisionList.length;k=k+1)
                     {
                         if(parameters.collisionList[k].length>0)
                             {
                                 temp = undefined;   // if building doesn't fit then dont build
                                  // set temp   if there is no collision.
                             }
-                    }
+                    }}
                 
                 console.log(parameters.collisionList);
                 console.log(temp);
@@ -804,17 +806,86 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
             }
         }
     return temp;
-}
+};
 AGENT.XRoadAgent = function(parameters)
 {
 'use strict';
 };
 
-AGENT.XRoadAgent.initialize = function(parameters){};
+AGENT.XRoadAgent.initialize = function(parameters)
+{
+    'use strict';
+//   new CylinderGeometry(20, 20, height, 2);
+    
+    
+ 	parameters = parameters ||
+		{
+			type : "XRoadAgent",
+			material : AGENT.Materials[4]
+		};
+	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 0.1, 50); // minimum size
+	parameters.geometry = parameters.geometry || new THREE.CylinderGeometry(20, 20, 2,16);
+	parameters.portals = [];  
+	parameters.agentUpdate = AGENT.XRoadAgent.update;
+    parameters.resetOrigin = true; 
+	// parameters = AGENT.updateParams(parameters,
+	// {
+	// type : 'BuildingAgent',
+	// material : AGENT.Materials[4]//new THREE.MeshBasicMaterial({color :
+	// 0x2f1a70})
+	// });
+	parameters.move = parameters.move || parameters.position;
+	
+    AGENT.RealAgent.initialize(parameters);
+	parameters = AGENT.updateParams(parameters,
+		{
+			name : 'XRoadAgent:' + parameters.uuid,
+            type : 'XRoadAgent'  
+		}); 
+	return parameters;   
+    
+    
+    
+};
 
 AGENT.RoadAgent = function(parameters)
 {
 'use strict';
 };
 
-AGENT.RoadAgent.initialize = function(parameters){};
+AGENT.RoadAgent.initialize = function(parameters)
+{
+    'use strict';
+	parameters = parameters ||
+		{
+			type : "RoadAgent",
+			material : AGENT.Materials[2]
+		};
+	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 0.1, 50); // minimum size
+	parameters.geometry = parameters.geometry || new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z);
+	parameters.portals =
+		[];
+	parameters.residents =
+		[];
+	parameters.maxResidents = parameters.maxResidents || 2;
+	parameters.agentUpdate = AGENT.RoadAgent.update;
+	// parameters = AGENT.updateParams(parameters,
+	// {
+	// type : 'BuildingAgent',
+	// material : AGENT.Materials[4]//new THREE.MeshBasicMaterial({color :
+	// 0x2f1a70})
+	// });
+	parameters.move = parameters.move || parameters.position;
+	
+    AGENT.RealAgent.initialize(parameters);
+	parameters = AGENT.updateParams(parameters,
+		{
+			name : 'RoadAgent:' + parameters.uuid,
+            type : 'RoadAgent'  
+		}); 
+	return parameters;
+};
+AGENT.RoadAgent.update = function(parameters)
+{
+    
+};

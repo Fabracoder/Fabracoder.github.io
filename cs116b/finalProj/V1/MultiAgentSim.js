@@ -4,9 +4,9 @@
 // disable jslint issue that I dont care about
 var floorHeight = 1000;
 var speed = 10000;
-var cameraX=0;
-var cameraY=700;
-var cameraZ=1700;
+var cameraX= 0.0;
+var cameraY=100;
+var cameraZ= 0.0;
 
 var minBuildingSize;
 
@@ -174,16 +174,19 @@ function initializeAgents(){
 //
 //            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,45)});
 //            AGENT.setVisable(pa);   
-//    
-            pa = AGENT.BuildingAgent.initialize();
-            AGENT.setVisable(pa); 
 
+     
+//            pa = AGENT.BuildingAgent.initialize();
+//            AGENT.setVisable(pa); 
+
+            pa = AGENT.RoadAgent.initialize({spinY:10});
+            AGENT.setVisable(pa); 
     
             pa = AGENT.XRoadAgent.initialize();
-    AGENT.setVisable(pa); 
+            AGENT.setVisable(pa); 
 //
-//    var pAgent = new RoadAgent({direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
-//    pAgent.setVisable(true);
+    pa =AGENT.RoadAgent.initialize({direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
+    AGENT.setVisable(pa);
 //    
 //   var pAgent2 = new RoadAgent({direction: new THREE.Vector3(0,0,0),  position : new THREE.Vector3( 0,0,0)});
 //      pAgent2.setVisable(true);
