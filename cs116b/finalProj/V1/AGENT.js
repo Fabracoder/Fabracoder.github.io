@@ -230,7 +230,7 @@ AGENT.RealAgent.initialize = function(parameters)
 
 	parameters.birthdate = parameters.birthdate || AGENT.Clock.getElapsedTime();
 	parameters.direction = parameters.direction || AGENT.getRND_V3_101();
-	parameters.move = parameters.move || parameters.direction;
+	parameters.move = parameters.move || parameters.position;
 	AGENT.RealAgent.moveObject(parameters);
 	// if (parameters.RListID === null)
 	// {
@@ -245,28 +245,16 @@ AGENT.RealAgent.resetInnerMeshOffset = function(parameters,resetOrigin)
 	parameters.innerMesh.geometry.computeBoundingBox();
 	var dist = new THREE.Vector3();
     
-    //resets it?
+    //resets it to 0,0,0
     parameters.innerMesh.translateX(-parameters.innerMesh.position.x);
     parameters.innerMesh.translateY(-parameters.innerMesh.position.y);
     parameters.innerMesh.translateZ(-parameters.innerMesh.position.z);
     
-//    if(resetOrigin===undefined)
-//    {
+ 
         dist.subVectors((parameters.innerMesh.geometry.boundingBox.max), (parameters.innerMesh.geometry.boundingBox.min));
         parameters.innerMesh.translateY(dist.y / 2); // even to floor
         parameters.innerMesh.translateZ(-dist.z / 2);// brings orgin to front
-//    }
-//    else
-//    {
-//        dist.subVectors((parameters.innerMesh.geometry.boundingBox.max), (parameters.innerMesh.geometry.boundingBox.min));
-////        parameters.outerObject.translateX(-dist.x / 2); // moves outerObject anti direction
-////        parameters.outerObject.translateY(-dist.y / 2); // moves outerObject anti direction
-////        parameters.outerObject.translateZ(dist.z / 2);// 
-//        
-//        parameters.innerMesh.translateX( dist.x / 2); // moves outerObject anti direction
-//        parameters.innerMesh.translateY(dist.y / 2); // even to floor
-//        parameters.innerMesh.translateZ(-dist.z / 2);// brings orgin to front
-//    }
+ 
     
     return parameters;
 };
@@ -666,12 +654,15 @@ AGENT.BuildingAgent.update = function(parameters)
 			pers.spawnCountdown = 5;
 			// set location of pers to a connected XRoad if it exists
 		}
-		parameters.maxResidents = parameters.maxResidents + 2;
+		parameters.maxResidents = parameters.maxResidents * 1.5;
 	}
     
     babies = ~~(parameters.residents.length/2);
-    
-    parameters.birthrateCounter = parameters.birthrateCounter ||100/babies;
+    if(babies==0)
+                {
+                    babies = 0.85;
+                }
+    parameters.birthrateCounter = parameters.birthrateCounter ||200/babies;
     
     
     if(parameters.birthrateCounter < 0)
@@ -682,10 +673,10 @@ AGENT.BuildingAgent.update = function(parameters)
                 {
                     position:new THREE.Vector3().add(parameters.outerObject.position),
                     maxWander: Math.random()*2000*babies, 
-                    minWander: 100
+                    minWander: 800*babies
                 }); 
             AGENT.setVisable(temp);  
-            console.log("babyBorn"+parameters.name);
+            console.log("babyBorn: "+ babies+": :"+parameters.name);
         }
         
         parameters.birthrateCounter = parameters.birthrateCounter - 1; 
@@ -764,7 +755,7 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
                     temp = AGENT.BuildingAgent.initialize(
                         {
                         move : new THREE.Vector3 (parameters.outerObject.position.x,parameters.outerObject.position.y,parameters.outerObject.position.z),
-                        material : AGENT.Materials[5],
+                        material : AGENT.Materials[4],
                         buildingSize : new THREE.Vector3(parameters.buildingSize.x,parameters.buildingSize.y,parameters.buildingSize.z)
                         });
                     temp.residents.push(parameters);
