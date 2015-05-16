@@ -15,6 +15,10 @@ AGENT.AgentRList =
 AGENT.Materials =
 	[]; // list of materials
 
+AGENT.degreeToRadian =function(value)
+{
+    return (value/360)*2*Math.PI;
+}
 // example usage
 // parameters = AGENT.updateParams(parameters,{name:'John Doe'});
 AGENT.updateParams = function (a, b)
@@ -176,8 +180,8 @@ AGENT.setVisable = function(parameters)
 			specular : 0xaa3333,
 			shininess : 15,
 			map : THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048.png"),
-			specularMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048_BW.jpg"),
-			normalMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea_normal_2048.jpg"),
+			specularMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048_BW.png"),
+			normalMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048_N.png"),
 			normalScale : new THREE.Vector2(0.85, 0.85)
 
 		}));
@@ -508,7 +512,7 @@ AGENT.PersonAgent.update = function(parameters)
         parameters.rest = AGENT.Clock.getElapsedTime();
         parameters.visable = false;
         AGENT.setVisable(parameters);
-        console.log("Building Entered:"+aBuilding.name);
+        if(debugModeOn)console.log("Building Entered:"+aBuilding.name);
     };
 	if (parameters === undefined)
 	{
@@ -592,7 +596,7 @@ AGENT.PersonAgent.update = function(parameters)
                     }
                 else
                     {
-                        console.log("BUILDING CREATED "+parameters.insideBuilding.outerObject.position);
+                        if(debugModeOn)console.log("BUILDING CREATED "+parameters.insideBuilding.outerObject.position);
                     }
 		} 
 		// generate random size
@@ -714,7 +718,7 @@ AGENT.BuildingAgent.update = function(parameters)
 	var temp = Math.random(), leng, pers,babies;
 	if (parameters.residents.length > parameters.maxResidents)
 	{
-        console.log("BuildingGrowing:"+parameters.name);
+        if(debugModeOn)console.log("BuildingGrowing:"+parameters.name);
 		if (temp > 0.5)
 		{
             // add a floor
@@ -772,11 +776,11 @@ AGENT.BuildingAgent.update = function(parameters)
                     minWander: 800*babies
                 }); 
             AGENT.setVisable(temp);  
-            console.log("babyBorn: "+ babies+": :"+parameters.name);
+            if(debugModeOn)console.log("babyBorn: "+ babies+": :"+parameters.name);
         }
             else
                 {
-                    console.log("NotBorn: "+ babies+": :"+parameters.name);
+                    if(debugModeOn)console.log("NotBorn: "+ babies+": :"+parameters.name);
                 }
     
         }
@@ -848,7 +852,7 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
                 
                 console.log(parameters.collisionList);
                 console.log(temp);
-                console.log("++++++++++++++");
+                if(debugModeOn)console.log("++++++++++++++");
                   
             // console.log(parameters.buildingSize.x + ":"+parameters.buildingSize.y  + ":"+parameters.buildingSize.z + ":");
                 
@@ -932,57 +936,57 @@ AGENT.XRoadAgent.update = function (parameters)
     else
     {
             parameters.rays = [AGENT.RealAgent.rays[0],AGENT.RealAgent.rays[2],AGENT.RealAgent.rays[4],AGENT.RealAgent.rays[6]]; 
-            parameters.rayDistances = [5000,5000,5000,5000];
+            parameters.rayDistances = [1000,1000,1000,1000];
             AGENT.RealAgent.collisionRaw(parameters,0);
 
         // (0, 0, 1),  (1, 0, 0),   (0, 0, -1), (-1, 0, 0) 
-        if(parameters.collisionList[0]>0)    
+        if(parameters.collisionList[0].length>0)    
         {
             list.push('west'); 
         }
-        if(parameters.collisionList[1]>0)    
+        if(parameters.collisionList[1].length>0)    
         {
             list.push('north'); 
         }
-        if(parameters.collisionList[2]>0)    
+        if(parameters.collisionList[2].length>0)    
         {
             list.push('east'); 
         }
-        if(parameters.collisionList[3]>0)    
+        if(parameters.collisionList[3].length>0)    
         {
             list.push ('south'); 
         }
             
-        list = list[((Math.random()*100)%list.length)];
+        list = list[Math.floor((Math.random()*100)%list.length)];
         switch(list)
             {
                 case 'west':
-                    list =  180;
+                    list =   AGENT.degreeToRadian(180);
                     break;
                     
                 case 'north':
 
-                    list =  90;
+                    list =  AGENT.degreeToRadian(90);
                     
                     break;
                     
                 case 'east':
-                    list =  0;
+                    list =  AGENT.degreeToRadian(0);
                     break;
                       
                 case 'south':
-                    list =  -90;
+                    list =  AGENT.degreeToRadian(-90);
                     break;
 
                 default:
-                    THREE.warn("Unreachable code reached: XRoad, switch : 0ghw0");
-                    list =0;
+                  // no link found
+                    list = AGENT.degreeToRadian(Math.floor((list%5)*90));
                     break;
                                         
             }
-        list = AGENT.RoadAgent();
+        list = AGENT.RoadAgent.initialize({position : parameters.outerObject.position,spinY :list});
         AGENT.setVisable(list);
-        
+        parameters.portals.push(list);
     }
 
 };
@@ -1023,6 +1027,9 @@ AGENT.RoadAgent.initialize = function(parameters)
 			name : 'RoadAgent:' + parameters.uuid,
             type : 'RoadAgent'  
 		}); 
+    
+    if(debugModeOn)console.log("RoadMade:"+parameters.name);
+    
 	return parameters; 
 };
 AGENT.RoadAgent.update = function(parameters)
@@ -1036,3 +1043,4 @@ AGENT.RoadAgent.update = function(parameters)
 		}
       
 };
+
