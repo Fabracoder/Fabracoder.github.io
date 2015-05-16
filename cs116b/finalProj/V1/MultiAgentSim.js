@@ -5,8 +5,8 @@
 var floorHeight = 1000;
 var speed = 10000;
 var cameraX=0;
-var cameraY=1000;
-var cameraZ=0;
+var cameraY=700;
+var cameraZ=1700;
 
 var minBuildingSize;
 
