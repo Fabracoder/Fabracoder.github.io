@@ -334,7 +334,7 @@ AGENT.RealAgent.collisionForward = function(parameters)
 
 	// Maximum distance from the origin before we consider collision
 	parameters.collisionDistance = parameters.collisionDistance || 32;
-
+    AGENT.RealAgent.rayCaster.far = parameters.collisionDistance;
 	// Get the obstacles array from our world
 	// scene.children
 
@@ -347,7 +347,7 @@ AGENT.RealAgent.collisionForward = function(parameters)
 
 	// Test if we intersect with any obstacle mesh
 
-	AGENT.updateActiveMeshes();
+	
 
 	collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
 	parameters.collisionList.push(collisions);// double array.
@@ -360,7 +360,7 @@ AGENT.RealAgent.collisionForward = function(parameters)
 
 // AGENT.RealAgent.collisionExpansion
 
-AGENT.RealAgent.collisionBuilding = function(parameters, useSize)
+AGENT.RealAgent.collisionBuilding = function(parameters)
 {
 
 	'use strict';
@@ -379,36 +379,61 @@ AGENT.RealAgent.collisionBuilding = function(parameters, useSize)
 	}
 
 	var i,collisions;
-
-	// Maximum distance from the origin before we consider collision
-	parameters.collisionDistance = parameters.collisionDistance || 32;
-
-	// Get the obstacles array from our world
-	// scene.children
-
-	// For each ray
 	parameters.collisionList =
 		[];
 
-	if (useSize)
-	{
-        
-	}
-	else
-	{
-		for (i = 0; i < this.rays.length; i += 1)
-		{
-			// We reset the raycaster to this direction
-			AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays);
-			// Test if we intersect with any obstacle mesh
-			collisions = AGENT.RealAgent.rayCaster.intersectObjects(parameters.scene.children);
-			parameters.collisionList.push(collisions);// double array.
-			// example : parameters.collisionList[0].length
-			// example : parameters.collisionList[0][0].distance
+	// Maximum distance from the origin before we consider collision
+	AGENT.RealAgent.rayCaster.far = parameters.buildingSize.x/2 +5;
 
-		}
-	}
+        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[2]); // 1,0,0
+                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+                parameters.collisionList.push(collisions);// double array.
 
+        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[6]); //-1,0,0
+                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+                parameters.collisionList.push(collisions);// double array.
+
+   AGENT.RealAgent.rayCaster.far = parameters.buildingSize.z/2 +5;
+        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[0]); // 0,0, 1
+                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+                parameters.collisionList.push(collisions);// double array.
+    
+        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[6]); // 0,0,-1
+                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+                parameters.collisionList.push(collisions);// double array.
+ 
+   AGENT.RealAgent.rayCaster.far = Math.sqrt((parameters.buildingSize.x/2)*(parameters.buildingSize.x/2)+(parameters.buildingSize.y/2)*(parameters.buildingSize.y/2))+5;
+        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[1]); // 0,0, 1
+                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+                parameters.collisionList.push(collisions);// double array.
+        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[3]); // 0,0,-1
+                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+                parameters.collisionList.push(collisions);// double array.
+        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[5]); // 0,0, 1
+                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+                parameters.collisionList.push(collisions);// double array.
+        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[7]); // 0,0,-1
+                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+                parameters.collisionList.push(collisions);// double array.
+      
+ // you could put here: cout << "OMG Potato" << endl; ...think about it
+// Get the obstacles array from our world
+	// scene.children
+
+	// For each ray
+// 
+//		for (i = 0; i < this.rays.length; i += 1)
+//		{
+//			// We reset the raycaster to this direction
+//			AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays);
+//			// Test if we intersect with any obstacle mesh
+//			collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
+//			parameters.collisionList.push(collisions);// double array.
+//			// example : parameters.collisionList[0].length
+//			// example : parameters.collisionList[0][0].distance
+//
+//		}
+ 
 	return parameters;
 };
 
@@ -425,14 +450,17 @@ AGENT.PersonAgent.initialize = function(parameters)
 {
 'use strict';
 	parameters = parameters ||
-		{
-			name : 'PersonAgent' + parameters.uuid,
+		{ 
 			geometry : new THREE.SphereGeometry(3, 32, 32),
 			type : 'PersonAgent'
 		};
 
 	parameters = AGENT.RealAgent.initialize(parameters);
-
+    
+	parameters = AGENT.updateParams(parameters,
+		{
+			name : 'PersonAgent:' + parameters.uuid
+		});
 	parameters.agentUpdate = AGENT.PersonAgent.update;
 
 	parameters.isWandering = parameters.isWandering || true;
@@ -542,8 +570,7 @@ AGENT.PersonAgent.update = function(parameters)
 		{
 			parameters.directionTime.newDirection = AGENT.getRND_V3_101();
 			parameters.directionTime.count = 100 * Math.random();
-			parameters.directionTime.delta = Math.random() * 0.6;
-
+			parameters.directionTime.delta = Math.random() * 0.6; 
 		}
 		else
 		{
@@ -554,10 +581,16 @@ AGENT.PersonAgent.update = function(parameters)
 	}
 	else
 	{
+        if(parameters.insideBuilding ===undefined)
+            {parameters.insideBuilding = null;}
 		if (parameters.insideBuilding === null)
 		{
                 parameters.wanderTime = 0;
-                AGENT.BuildingAgent.tryMakeBuilding(parameters);
+                parameters.insideBuilding = AGENT.BuildingAgent.tryMakeBuilding(parameters);
+                if(! parameters.insideBuilding )
+                    {
+                        parameters.isWandering = true;
+                    }
 		} 
 		// generate random size
 		// check if I can build here
@@ -589,8 +622,8 @@ AGENT.BuildingAgent.initialize = function(parameters)
 			type : "BuildingAgent",
 			material : AGENT.Materials[4]
 		};
-	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(50, 10, 50); //
-	parameters.geometry = parameters.geometry || new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z, 5, 5, 5);
+	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(50, 10, 50); // minimum size
+	parameters.geometry = parameters.geometry || new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z);
 	parameters.portals =
 		[];
 	parameters.residents =
@@ -656,36 +689,86 @@ AGENT.BuildingAgent.update = function(parameters)
 
 AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
 {
+    var temp,i,k,temp2,flag ;
         if(parameters)
         {
             parameters.rays = AGENT.RealAgent.rays;
-            AGENT.RealAgent.collisionBuilding(parameters );  
 
-            // (parameters.collisionList[0][0].object.owner.type=="BuildingAgent"
-            // )
+        // (parameters.collisionList[0][0].object.owner.type=="BuildingAgent" )
 
-            // check space,
-            // if not buildable, reduce size until you reach minimum size
-            // if at minimum and does not fit, then reduce 30 from wanderTime         
+        // check space,
+        // if not buildable, reduce size until you reach minimum size
+        // if at minimum and does not fit, then reduce 30 from wanderTime         
+            for(i=0;i<100;i=i+1)
+            {
 
-            if(parameters.buildingSize===undefined)
+                if(parameters.buildingSize===undefined)
                 {
-                    parameters.buildingSize = new THREE.Vector3(50+(~~(Math.random()*10))*10,((~~(Math.random()*4))*10)+10 + Math.random()/10,(50+(~~(Math.random()*10))*10));
+                    parameters.buildingSize = 
+                     new THREE.Vector3(50+(~~(Math.random()*10))*10,((~~(Math.random()*4))*10)+10 + Math.random()/10,(50+(~~(Math.random()*10))*10));
                 }
-            
-            console.log(parameters.buildingSize.x + ":"+parameters.buildingSize.y  + ":"+parameters.buildingSize.z + ":");
-
-            temp = AGENT.BuildingAgent.initialize(
+                else // reduce size
                 {
-                    move : new THREE.Vector3 (parameters.outerObject.position.x,parameters.outerObject.position.y,parameters.outerObject.position.z),
-                    buildingSize : new THREE.Vector3(parameters.buildingSize.x,parameters.buildingSize.y,parameters.buildingSize.z)
-                });
-            temp.residents.push(parameters);
-            parameters.insideBuilding = temp;
-            AGENT.setVisable(temp);
-            parameters.visable = false;
-            AGENT.setVisable(parameters);
+                    if(parameters.buildingSize.x>=60 || parameters.buildingSize.z>=60)
+                    {
+                        if(Math.random>0.5)
+                        {
+                            if(parameters.buildingSize.x>=60)
+                                {parameters.buildingSize.setX(parameters.buildingSize.x-10);}
+                        }
+                        else
+                        {
+                            if(parameters.buildingSize.y>=60)
+                                {parameters.buildingSize.setY(parameters.buildingSize.y-10);}
+                        }
+                    }
+                    else
+                        { // can't fit in space, now what?
+                            flag = true;
+                        } 
+                }
+                AGENT.RealAgent.collisionBuilding(parameters );  
+                
+                temp = null;
+                for(k=0;k<parameters.collisionList.length;k++)
+                    {
+                        if(parameters.collisionList[k].length>0)
+                            {
+                                temp = undefined;   // if building doesn't fit then dont build
+                                 // set temp   if there is no collision.
+                            }
+                    }
+                
+                console.log(parameters.collisionList);
+                console.log(temp);
+                console.log("++++++++++++++");
+                  
+            // console.log(parameters.buildingSize.x + ":"+parameters.buildingSize.y  + ":"+parameters.buildingSize.z + ":");
+                
+                if(temp!==undefined)
+                {
+                    temp = AGENT.BuildingAgent.initialize(
+                        {
+                        move : new THREE.Vector3 (parameters.outerObject.position.x,parameters.outerObject.position.y,parameters.outerObject.position.z),
+                        buildingSize : new THREE.Vector3(parameters.buildingSize.x,parameters.buildingSize.y,parameters.buildingSize.z)
+                        });
+                    temp.residents.push(parameters);
+                    parameters.insideBuilding = temp;
+                    AGENT.setVisable(temp);
+                    parameters.visable = false;
+                    AGENT.setVisable(parameters);
+                    return temp;
+                } 
+                else
+                {
+                    if(flag)
+                        {
+                            return temp;
+                        }
+                }
+            }
         }
+    return temp;
 }
 AGENT.XRoadAgent = function(parameters)
 {

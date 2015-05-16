@@ -105,7 +105,7 @@ function cameraInit(){
      initializeAgents();
  //    runTest();
         
-//     initializeHelper();
+     initializeHelper();
      
      renderer = new THREE.WebGLRenderer();
      renderer.setPixelRatio(window.devicePixelRatio);
@@ -243,6 +243,7 @@ function degreeToRadian(value)
  
      for(var k =0 ;k<AGENT.AgentPList.length;k++)
          {
+             AGENT.updateActiveMeshes(); 
              AGENT.AgentPList[k].agentUpdate(AGENT.AgentPList[k]);
          }
      if(helper!=null)
