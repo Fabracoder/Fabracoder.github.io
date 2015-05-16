@@ -37,7 +37,7 @@ AGENT.updateParams = function (a, b)
 	return a;
 };
 
-AGENT.updateActiveMeshes = function()
+AGENT.updateActiveBuildings = function()
 {
     'use strict';
 	var i;
@@ -53,6 +53,27 @@ AGENT.updateActiveMeshes = function()
 		if (AGENT.AgentPList[i].visable && AGENT.AgentPList[i].type =='BuildingAgent')
 		{
 			AGENT.activeMeshes.push(AGENT.AgentPList[i].outerObject);
+		}
+	}
+
+};
+
+AGENT.updateActivePersons = function()
+{
+    'use strict';
+	var i;
+    if(AGENT.activePersons === undefined)
+        {
+            	AGENT.activePersons = []; 
+        }
+    else
+        AGENT.activePersons.length = 0;
+
+	for (i = 0; i < AGENT.AgentPList.length; i=i+1)
+	{
+		if (AGENT.AgentPList[i].visable && AGENT.AgentPList[i].type =='PersonAgent')
+		{
+			AGENT.activePersons.push(AGENT.AgentPList[i].outerObject);
 		}
 	}
 
@@ -92,19 +113,19 @@ AGENT.setVisable = function(parameters)
 		{
 			if (parameters.outerObject !== undefined)
 			{
+                AGENT.updateActivePersons();
+                AGENT.updateActiveBuildings();  
 				if (parameters.visable)
 				{
 					if (scene.children.indexOf(parameters.outerObject) === -1)
 					{
-						scene.add(parameters.outerObject);
-                        AGENT.updateActiveMeshes();  
+						scene.add(parameters.outerObject); 
 						return 'Obj Added:' + parameters.uuid;
 					}
 				}
 				else
 				{
-					scene.remove(parameters.outerObject);
-                    AGENT.updateActiveMeshes();  
+					scene.remove(parameters.outerObject);  
 					return 'Obj Removed:' + parameters.uuid;
 				}
 			}
@@ -159,7 +180,7 @@ AGENT.setVisable = function(parameters)
 			normalScale : new THREE.Vector2(0.85, 0.85)
 
 		}));
-    AGENT.updateActiveMeshes();
+    AGENT.updateActiveBuildings();
 
 }());
 
@@ -491,13 +512,13 @@ AGENT.PersonAgent.update = function(parameters)
 		// to match the street direction
  
             parameters.rays = [parameters.direction];
-            parameters.rayDistances = [parameters.boundingSphere.radius+5];
+            parameters.rayDistances = [parameters.boundingSphere.radius+6];
             AGENT.RealAgent.collisionRaw(parameters);
 
         while (parameters.collisionList[0].length > 0)
         { 
             // Person enters building
-            if (parameters.collisionList[0][0].object.owner.type === 'BuildingAgent' && Math.random()<0.4) 
+            if (parameters.collisionList[0][0].object.owner.type === 'BuildingAgent' && Math.random()<1) 
             {
                 // enter building
                 _enterBuilding(parameters,parameters.collisionList[0][0].object.owner);
@@ -588,7 +609,7 @@ AGENT.BuildingAgent.initialize = function(parameters)
 	parameters = parameters ||
 		{
 			type : "BuildingAgent",
-			material : AGENT.Materials[5]
+			material : AGENT.Materials[2]
 		};
 	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(50, 10, 50); // minimum size
 	parameters.geometry = parameters.geometry || new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z);
@@ -654,7 +675,7 @@ AGENT.BuildingAgent.update = function(parameters)
 			pers.spawnCountdown = 5;
 			// set location of pers to a connected XRoad if it exists
 		}
-		parameters.maxResidents = parameters.maxResidents * 1.5;
+		parameters.maxResidents = parameters.maxResidents * 2;
 	}
     
     babies = ~~(parameters.residents.length/2);
@@ -664,11 +685,13 @@ AGENT.BuildingAgent.update = function(parameters)
                 }
     parameters.birthrateCounter = parameters.birthrateCounter ||200/babies;
     
-    
     if(parameters.birthrateCounter < 0)
         {
             parameters.birthrateCounter  = 100/babies;
-            
+
+                // change this to limit the number of active people
+    if(AGENT.activePersons.length<100)//limiter for population
+        {
             temp = AGENT.PersonAgent.initialize(
                 {
                     position:new THREE.Vector3().add(parameters.outerObject.position),
@@ -677,6 +700,12 @@ AGENT.BuildingAgent.update = function(parameters)
                 }); 
             AGENT.setVisable(temp);  
             console.log("babyBorn: "+ babies+": :"+parameters.name);
+        }
+            else
+                {
+                    console.log("NotBorn: "+ babies+": :"+parameters.name);
+                }
+    
         }
         
         parameters.birthrateCounter = parameters.birthrateCounter - 1; 
@@ -688,7 +717,7 @@ AGENT.BuildingAgent.update = function(parameters)
 AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
 {
     var temp,i,k,diagValue,flag ;
-    AGENT.updateActiveMeshes();
+    AGENT.updateActiveBuildings();
         if(parameters)
         {
             parameters.rays = AGENT.RealAgent.rays;
@@ -755,7 +784,7 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
                     temp = AGENT.BuildingAgent.initialize(
                         {
                         move : new THREE.Vector3 (parameters.outerObject.position.x,parameters.outerObject.position.y,parameters.outerObject.position.z),
-                        material : AGENT.Materials[4],
+                        material : AGENT.Materials[2],
                         buildingSize : new THREE.Vector3(parameters.buildingSize.x,parameters.buildingSize.y,parameters.buildingSize.z)
                         });
                     temp.residents.push(parameters);
