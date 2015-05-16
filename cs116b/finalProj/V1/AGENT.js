@@ -46,7 +46,7 @@ AGENT.updateActiveMeshes = function()
 
 	for (i = 0; i < AGENT.AgentPList.length; i=i+1)
 	{
-		if (AGENT.AgentPList[i].visable)
+		if (AGENT.AgentPList[i].visable && AGENT.AgentPList[i].type =='BuildingAgent')
 		{
 			AGENT.activeMeshes.push(AGENT.AgentPList[i].outerObject);
 		}
@@ -73,7 +73,7 @@ AGENT.setVisable = function(parameters)
 	{
 		parameters.visable = true;
 	}
-
+    
 	try
 	{  
 		parameters.scene = parameters.scene || scene || window.scene || undefined;
@@ -93,17 +93,20 @@ AGENT.setVisable = function(parameters)
 					if (scene.children.indexOf(parameters.outerObject) === -1)
 					{
 						scene.add(parameters.outerObject);
+                        AGENT.updateActiveMeshes();  
 						return 'Obj Added:' + parameters.uuid;
 					}
 				}
 				else
 				{
 					scene.remove(parameters.outerObject);
+                    AGENT.updateActiveMeshes();  
 					return 'Obj Removed:' + parameters.uuid;
 				}
 			}
 		}
 	}
+    
 };
 (function()
 {
@@ -142,6 +145,8 @@ AGENT.setVisable = function(parameters)
 			normalScale : new THREE.Vector2(0.85, 0.85)
 
 		}));
+    
+    AGENT.updateActiveMeshes();
 
 }());
 
@@ -188,12 +193,9 @@ AGENT.RealAgent.initialize = function(parameters)
 	parameters.agentUpdate = parameters.agentUpdate || AGENT.RealAgent.update;
 	parameters.RListID = parameters.RListID || null;
 
-	parameters = parameters ||
-		{
-			name : 'RealAgent' + parameters.uuid,
-			type : 'RealAgent'
-		};
-	parameters.rays = parameters.rays || AGENT.RealAgent.rays;
+    AGENT.updateParams(parameters,{ name : 'RealAgent' + parameters.uuid, type : 'RealAgent' });
+    
+ 	parameters.rays = parameters.rays || AGENT.RealAgent.rays;
 	parameters.geometry = parameters.geometry || new THREE.SphereGeometry(5, 32, 32);
 	parameters.geometry.computeBoundingBox();
 	// random color
@@ -224,15 +226,28 @@ AGENT.RealAgent.initialize = function(parameters)
 	return parameters;
 };
 
-AGENT.RealAgent.resetInnerMeshOffset = function(parameters)
+AGENT.RealAgent.resetInnerMeshOffset = function(parameters,resetOrigin)
 {
  'use strict';
 	parameters.innerMesh.geometry.computeBoundingBox();
 	var dist = new THREE.Vector3();
-	dist.subVectors((parameters.innerMesh.geometry.boundingBox.max), (parameters.innerMesh.geometry.boundingBox.min));
-	parameters.innerMesh.translateY(dist.y / 2); // even to floor
-	parameters.innerMesh.translateZ(-dist.z / 2);// brings orgin to front
-	return parameters;
+    if(resetOrigin===undefined)
+    {
+        dist.subVectors((parameters.innerMesh.geometry.boundingBox.max), (parameters.innerMesh.geometry.boundingBox.min));
+        parameters.innerMesh.translateY(dist.y / 2); // even to floor
+        parameters.innerMesh.translateZ(-dist.z / 2);// brings orgin to front
+    }
+    else
+    {
+        dist.subVectors((parameters.innerMesh.geometry.boundingBox.max), (parameters.innerMesh.geometry.boundingBox.min));
+        parameters.outerObject.translateY(-dist.y / 2); // moves outerObject anti direction
+        parameters.outerObject.translateZ(dist.z / 2);// 
+        
+         parameters.innerMesh.translateY(dist.y / 2); // even to floor
+        parameters.innerMesh.translateZ(-dist.z / 2);// brings orgin to front
+    }
+    
+    return parameters;
 };
 
 AGENT.RealAgent.setObjPosition = function(parameters)
@@ -310,14 +325,15 @@ AGENT.RealAgent.rays =
 			new THREE.Vector3(-1, 0, -1), new THREE.Vector3(-1, 0, 0), new THREE.Vector3(-1, 0, 1)
 	];
 AGENT.RealAgent.rayCaster = new THREE.Raycaster();
-AGENT.RealAgent.rayCaster.far = 4;
-
-AGENT.RealAgent.collisionForward = function(parameters)
-{
-
-	'use strict';
-
-	if (parameters === undefined)
+AGENT.RealAgent.rayCaster.far = 8;
+ 
+AGENT.RealAgent.collisionRaw = function(parameters,yOffset)
+{	'use strict';
+//    parameters.rays;
+//    parameters.raydistances;
+ 
+	var i, collisions;
+ 	if (parameters === undefined)
 	{
 		return;
 	}
@@ -329,114 +345,41 @@ AGENT.RealAgent.collisionForward = function(parameters)
 	{
 		return;
 	}
-
-	var i, collisions;
-
-	// Maximum distance from the origin before we consider collision
-	parameters.collisionDistance = parameters.collisionDistance || 32;
-    AGENT.RealAgent.rayCaster.far = parameters.collisionDistance;
+    if(parameters.rayDistances ===undefined)
+        {
+            return;
+        }
+     if(parameters.rays.length!=parameters.rayDistances.length)
+         {
+             THREE.warn("RayArray and RayDistanceArray do not match length");
+             return;
+         }
+    yOffset = yOffset || 0;
+    	// Maximum distance from the origin before we consider collision 
+//    AGENT.RealAgent.rayCaster.far = parameters.collisionDistance  || 32;
 	// Get the obstacles array from our world
 	// scene.children
 
 	// For each ray
-	parameters.collisionList =
-		[];
-
+	parameters.collisionList = []; 
 	// We reset the raycaster to this direction at a height of 1
-	AGENT.RealAgent.rayCaster.set(((new THREE.Vector3(0, 1, 0)).add(parameters.outerObject.position)), parameters.direction);
+    
+    for(i=0;i<parameters.rays.length;i++)
+    {
+        AGENT.RealAgent.rayCaster.far = parameters.rayDistances[i] || 32;
+        AGENT.RealAgent.rayCaster.set(((new THREE.Vector3(0, yOffset, 0)).add(parameters.outerObject.position)), parameters.rays[i]);
 
-	// Test if we intersect with any obstacle mesh
-
-	
-
+	// Test if we intersect with any obstacle mesh 
+    // AGENT.activeMeshes should contain all the buildings and be updated every frame
 	collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
 	parameters.collisionList.push(collisions);// double array.
+ }
 	// example : parameters.collisionList[0].length
 	// example : parameters.collisionList[0][0].distance
+
+	return collisions;
+}
  
-
-	return parameters;
-};
-
-// AGENT.RealAgent.collisionExpansion
-
-AGENT.RealAgent.collisionBuilding = function(parameters)
-{
-
-	'use strict';
-
-	if (parameters === undefined)
-	{
-		return;
-	}
-	if (parameters.outerObject === undefined)
-	{
-		return;
-	}
-	if (parameters.rays === undefined)
-	{
-		return;
-	}
-
-	var i,collisions;
-	parameters.collisionList =
-		[];
-
-	// Maximum distance from the origin before we consider collision
-	AGENT.RealAgent.rayCaster.far = parameters.buildingSize.x/2 +5;
-
-        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[2]); // 1,0,0
-                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-                parameters.collisionList.push(collisions);// double array.
-
-        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[6]); //-1,0,0
-                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-                parameters.collisionList.push(collisions);// double array.
-
-   AGENT.RealAgent.rayCaster.far = parameters.buildingSize.z/2 +5;
-        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[0]); // 0,0, 1
-                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-                parameters.collisionList.push(collisions);// double array.
-    
-        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[6]); // 0,0,-1
-                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-                parameters.collisionList.push(collisions);// double array.
- 
-   AGENT.RealAgent.rayCaster.far = Math.sqrt((parameters.buildingSize.x/2)*(parameters.buildingSize.x/2)+(parameters.buildingSize.y/2)*(parameters.buildingSize.y/2))+5;
-        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[1]); // 0,0, 1
-                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-                parameters.collisionList.push(collisions);// double array.
-        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[3]); // 0,0,-1
-                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-                parameters.collisionList.push(collisions);// double array.
-        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[5]); // 0,0, 1
-                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-                parameters.collisionList.push(collisions);// double array.
-        AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays[7]); // 0,0,-1
-                collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-                parameters.collisionList.push(collisions);// double array.
-      
- // you could put here: cout << "OMG Potato" << endl; ...think about it
-// Get the obstacles array from our world
-	// scene.children
-
-	// For each ray
-// 
-//		for (i = 0; i < this.rays.length; i += 1)
-//		{
-//			// We reset the raycaster to this direction
-//			AGENT.RealAgent.rayCaster.set(parameters.outerObject.position, parameters.rays);
-//			// Test if we intersect with any obstacle mesh
-//			collisions = AGENT.RealAgent.rayCaster.intersectObjects(AGENT.activeMeshes, true);
-//			parameters.collisionList.push(collisions);// double array.
-//			// example : parameters.collisionList[0].length
-//			// example : parameters.collisionList[0][0].distance
-//
-//		}
- 
-	return parameters;
-};
-
 // ///////////
 // PersonAgent
 // ///////////
@@ -459,6 +402,7 @@ AGENT.PersonAgent.initialize = function(parameters)
     
 	parameters = AGENT.updateParams(parameters,
 		{
+            type : 'PersonAgent',
 			name : 'PersonAgent:' + parameters.uuid
 		});
 	parameters.agentUpdate = AGENT.PersonAgent.update;
@@ -501,7 +445,8 @@ AGENT.PersonAgent.initialize = function(parameters)
 		parameters.direction = Vector3 || AGENT.getRND_V3_101();
 		return parameters;
 	};
-
+    parameters.innerMesh.geometry.computeBoundingSphere()
+    parameters.boundingSphere = parameters.innerMesh.geometry.boundingSphere;
 	return parameters;
 
 };
@@ -509,7 +454,17 @@ AGENT.PersonAgent.update = function(parameters)
 {
 'use strict';
 	var temp;
-
+    var _enterBuilding  = function(parameters,aBuilding)
+    {
+        parameters.insideBuilding = aBuilding;
+        aBuilding.residents.push(parameters);
+        parameters.isWandering = false; 
+        parameters.wanderTime = 0;
+        parameters.rest = AGENT.Clock.getElapsedTime();
+        parameters.visable = false;
+        AGENT.setVisable(parameters);
+        console.log("Building Entered:"+aBuilding.name);
+    };
 	if (parameters === undefined)
 	{
 		return;
@@ -525,59 +480,58 @@ AGENT.PersonAgent.update = function(parameters)
 		// If it is a building, and you collide, enter building
 		// If it is a street, and you collide, change direction vector
 		// to match the street direction
-		if (parameters.spawnCountdown !== undefined)
-		{
-			parameters.spawnCountdown=parameters.spawnCountdown-1;
-			if (parameters.spawnCountdown < 0)
-			{
-				parameters.spawnCountdown = undefined;
-			}
-		}
-		else
-		{
-			AGENT.RealAgent.collisionForward(parameters);
+ 
+            parameters.rays = [parameters.direction];
+            parameters.rayDistances = [parameters.boundingSphere.radius+5];
+            AGENT.RealAgent.collisionRaw(parameters);
 
-			while (parameters.collisionList[0].length > 0)
-			{
+        while (parameters.collisionList[0].length > 0)
+        { 
+            // Person enters building
+            if (parameters.collisionList[0][0].object.owner.type === 'BuildingAgent' && Math.random()<0.4) 
+            {
+                // enter building
+                _enterBuilding(parameters,parameters.collisionList[0][0].object.owner);
+                parameters.collisionList[0].length=0;//exit loop
+            }//TODO: add function for interaction with road or xroad
+            else
+            {    
+                //get new direction
+                parameters.direction = AGENT.getRND_V3_101();
+                //test new direction
+                parameters.rays = [parameters.direction];
+                parameters.rayDistances = [parameters.boundingSphere.radius+5];
+                AGENT.RealAgent.collisionRaw(parameters);
+            }
+        } 
+        
+        if(parameters.isWandering) // in case entered building
+        {
+            parameters.move = parameters.direction;
+		    AGENT.RealAgent.moveObject(parameters);
 
-				if (parameters.collisionList[0][0].object.owner.type === "BuildingAgent" && Math.random()<0.4) 
-				{
-					parameters.isWandering = false;
-					parameters.insideBuilding = parameters.collisionList[0][0].owner;
-					parameters.collisionList[0][0].owner.residents.push(parameters);
-                    
-					parameters.visable = false;
-					AGENT.setVisable(parameters);
-					// enter building
-				}
-                 
+            if (parameters.wanderLust - parameters.wanderTime < 0)
+            {
+                parameters.isWandering = false;
+            }
 
-				parameters.direction = AGENT.getRND_V3_101();
-				AGENT.RealAgent.collisionForward(parameters);
-			}
-		}
-		parameters.move = parameters.direction;
-		AGENT.RealAgent.moveObject(parameters);
+              parameters.wanderTime=parameters.wanderTime+1;
 
-		if (parameters.wanderLust - parameters.wanderTime < 0)
-		{
-			parameters.isWandering = false;
-		}
-		parameters.wanderTime=parameters.wanderTime+1;
+            parameters.directionTime.count=parameters.directionTime.count-1;
 
-		parameters.directionTime.count=parameters.directionTime.count-1;
-		if (parameters.directionTime.count < 0)
-		{
-			parameters.directionTime.newDirection = AGENT.getRND_V3_101();
-			parameters.directionTime.count = 100 * Math.random();
-			parameters.directionTime.delta = Math.random() * 0.6; 
-		}
-		else
-		{
-			parameters.direction = parameters.direction.add(parameters.directionTime.newDirection.multiplyScalar(parameters.directionTime.delta));
-			parameters.direction = parameters.direction.normalize();
-			parameters.directionTime.count -= 1;
-		}
+            if (parameters.directionTime.count < 0)
+            {
+                parameters.directionTime.newDirection = AGENT.getRND_V3_101();
+                parameters.directionTime.count = 100 * Math.random();
+                parameters.directionTime.delta = Math.random() * 0.6; 
+            }
+            else
+            {
+                parameters.direction = parameters.direction.add(parameters.directionTime.newDirection.multiplyScalar(parameters.directionTime.delta));
+                parameters.direction = parameters.direction.normalize();
+                parameters.directionTime.count -= 1;
+            }
+         }
 	}
 	else
 	{
@@ -591,6 +545,10 @@ AGENT.PersonAgent.update = function(parameters)
                     {
                         parameters.isWandering = true;
                     }
+                else
+                    {
+                        console.log("BUILDING CREATED "+parameters.insideBuilding.outerObject.position);
+                    }
 		} 
 		// generate random size
 		// check if I can build here
@@ -600,6 +558,7 @@ AGENT.PersonAgent.update = function(parameters)
 		// check if I can build here
 		// 
 	}
+
 
 	return parameters;
 };
@@ -637,29 +596,31 @@ AGENT.BuildingAgent.initialize = function(parameters)
 	// 0x2f1a70})
 	// });
 	parameters.move = parameters.move || parameters.position;
-	parameters = AGENT.RealAgent.initialize(parameters);
+	
+    AGENT.RealAgent.initialize(parameters);
 	parameters = AGENT.updateParams(parameters,
 		{
-			name : 'BuildingAgent:' + parameters.uuid
-		});
-
+			name : 'BuildingAgent:' + parameters.uuid,
+            type : 'BuildingAgent'  
+		}); 
 	return parameters;
 };
 
 AGENT.BuildingAgent.update = function(parameters)
 {
     'use strict';
-	var temp = Math.random(), leng, pers;
+	var temp = Math.random(), leng, pers,babies;
 	if (parameters.residents.length > parameters.maxResidents)
 	{
-		if (temp > 0.2)
+        console.log("BuildingGrowing:"+parameters.name);
+		if (temp > 0.1)
 		{
-			parameters.buildingSize.add(new THREE.Vector3(0, 10, 0));// add a
-																		// floor
+            // add a floor
+			parameters.buildingSize.add(new THREE.Vector3(0, 10, 0));
 		}
 		else
 		{
-			if (temp < 0.1)
+			if (temp < 0.05)
 			{
 				parameters.buildingSize.add(new THREE.Vector3(10, 0, 0));
 			}// grow
@@ -669,7 +630,7 @@ AGENT.BuildingAgent.update = function(parameters)
 			}// grow
 		}
 		parameters.innerMesh.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z, 5, 5, 5);
-		AGENT.RealAgent.resetInnerMeshOffset(parameters);
+		AGENT.RealAgent.resetInnerMeshOffset(parameters,true);
 		leng = parameters.residents.length * temp; // random number of people
 													// will leave
 		for (temp = 0; temp < leng; temp=temp+1)
@@ -684,12 +645,35 @@ AGENT.BuildingAgent.update = function(parameters)
 		}
 		parameters.maxResidents = parameters.maxResidents + 2;
 	}
+    
+    babies = ~~(parameters.residents.length/2);
+    
+    parameters.birthrateCounter = parameters.birthrateCounter ||100/babies;
+    
+    
+    if(parameters.birthrateCounter < 0)
+        {
+            parameters.birthrateCounter  = 100/babies;
+            
+            temp = AGENT.PersonAgent.initialize(
+                {
+                    position:new THREE.Vector3().add(parameters.outerObject.position),
+                    maxWander: Math.random()*2000*babies, 
+                    minWander: 100
+                }); 
+            AGENT.setVisable(temp);  
+            console.log("babyBorn"+parameters.name);
+        }
+        
+        parameters.birthrateCounter = parameters.birthrateCounter - 1; 
+    
+  
 
 };
 
 AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
 {
-    var temp,i,k,temp2,flag ;
+    var temp,i,k,diagValue,flag ;
         if(parameters)
         {
             parameters.rays = AGENT.RealAgent.rays;
@@ -718,8 +702,8 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
                         }
                         else
                         {
-                            if(parameters.buildingSize.y>=60)
-                                {parameters.buildingSize.setY(parameters.buildingSize.y-10);}
+                            if(parameters.buildingSize.z>=60)
+                                {parameters.buildingSize.setZ(parameters.buildingSize.z-10);}
                         }
                     }
                     else
@@ -727,9 +711,17 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
                             flag = true;
                         } 
                 }
-                AGENT.RealAgent.collisionBuilding(parameters );  
-                
+
                 temp = null;
+                
+                parameters.rays = AGENT.rays;
+                diagValue = Math.sqrt((parameters.buildingSize.x/2)*(parameters.buildingSize.x/2)+(parameters.buildingSize.z/2)*(parameters.buildingSize.z/2));
+ //(0, 0, 1), (1, 0, 1),  (1, 0, 0), (1, 0, -1), (0, 0, -1),(-1, 0, -1), (-1, 0, 0), (-1, 0, 1)                
+                parameters.rayDistances = [parameters.buildingSize.z/2,diagValue,parameters.buildingSize.x/2,diagValue,parameters.buildingSize.z/2,diagValue,parameters.buildingSize.x/2,diagValue];
+                
+                AGENT.RealAgent.collisionRaw(parameters,1); 
+                
+
                 for(k=0;k<parameters.collisionList.length;k++)
                     {
                         if(parameters.collisionList[k].length>0)

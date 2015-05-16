@@ -23,23 +23,7 @@ var helper;
 var clock = new THREE.Clock();
 var minPlotSize =50;
  
-var materialQ = new THREE.MeshPhongMaterial({
-
-     specular: 0x333333,
-     shininess: 15,
-     map: THREE.ImageUtils.loadTexture("Resources/final_textures/greyc.jpg")
-         //    ,specularMap: THREE.ImageUtils.loadTexture("Resources/final_textures/ea_specular_2048.jpg")
- });
-
- var materialX = new THREE.MeshPhongMaterial({
-     // light
-     specular: '#010101',
-     // intermediate
-     color: '#883311',
-     // dark
-     //         emissive: '#505063',
-     shininess: 50
- });
+  
      var materialNormalMap = new THREE.MeshPhongMaterial({
 
          specular: 0x333333,
@@ -153,7 +137,7 @@ function initializeHelper(){
 };
 function initializeAgents(){ 
         var pa,temp,tmp;
-    for(  temp = 0;temp<5;temp++)
+    for(  temp = 0;temp<20;temp++)
         {  
             pa = AGENT.PersonAgent.initialize(
                 {
@@ -171,27 +155,27 @@ function initializeAgents(){
 //            AGENT.setVisable(pa); 
 //        }
 
-        for(tmp=-3 ;tmp<3;tmp++)
-            {
-                for(temp=-3;temp<3;temp++)
-                    {
-                        if(temp==-3 || tmp ==-3 || temp == 2)
-                        { 
-                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(55*tmp ,0,55*temp)});
-                         AGENT.setVisable(pa); 
-                        }
-            
-                    }
-            }
+//        for(tmp=-3 ;tmp<3;tmp++)
+//            {
+//                for(temp=-3;temp<3;temp++)
+//                    {
+//                        if(temp==-3 || tmp ==-3 || temp == 2)
+//                        { 
+//                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(55*tmp ,0,55*temp)});
+//                         AGENT.setVisable(pa); 
+//                        }
+//            
+//                    }
+//            }
     
-            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150 ,0,-110)});
-            AGENT.setVisable(pa); 
+//            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(0 ,0,-100),buildingSize:new THREE.Vector3(600,10,100)});
+//            AGENT.setVisable(pa); 
             
-            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,-55)});
-            AGENT.setVisable(pa); 
-
-            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,45)});
-            AGENT.setVisable(pa);   
+//            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,-55)});
+//            AGENT.setVisable(pa); 
+//
+//            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,45)});
+//            AGENT.setVisable(pa);   
 
 //    var pAgent = new RoadAgent({direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
 //    pAgent.setVisable(true);
@@ -242,8 +226,7 @@ function degreeToRadian(value)
      controls.update(delta);
  
      for(var k =0 ;k<AGENT.AgentPList.length;k++)
-         {
-             AGENT.updateActiveMeshes(); 
+         { 
              AGENT.AgentPList[k].agentUpdate(AGENT.AgentPList[k]);
          }
      if(helper!=null)
