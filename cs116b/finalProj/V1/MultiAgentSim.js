@@ -3,7 +3,7 @@
 /*jslint vars: true */
 // disable jslint issue that I dont care about
 var floorHeight = 1000;
-var speed = 100000;
+var speed = 10000;
 var cameraX=0;
 var cameraY=1000;
 var cameraZ=0;
@@ -137,46 +137,50 @@ function initializeHelper(){
 };
 function initializeAgents(){ 
         var pa,temp,tmp;
-    for(  temp = 0;temp<40;temp++)
-        {  
-            pa = AGENT.PersonAgent.initialize(
-                {
-                    maxWander: Math.random()*6000, 
-                    minWander: 100
-                }); 
-            AGENT.setVisable(pa);   
-            
-        }
+//    for(  temp = 0;temp<10;temp++)
+//        {  
+//            pa = AGENT.PersonAgent.initialize(
+//                {
+//                    maxWander: Math.random()*6000, 
+//                    minWander: 100
+//                }); 
+//            AGENT.setVisable(pa);   
+//            
+//        }
 //     for(var temp = 0;temp<10;temp++)
 //        { 
 //            pa = AGENT.BuildingAgent.initialize({position:AGENT.getRND_V3_101().multiplyScalar(1000)});
 //            AGENT.setVisable(pa); 
 //        }
 
-        for(tmp=-3 ;tmp<3;tmp++)
-            {
-                for(temp=-3;temp<3;temp++)
-                    {
-                        if(temp==-3 || tmp ==-3 || temp == 2)
-                        { 
-                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(55*tmp ,0,55*temp)});
-                         AGENT.setVisable(pa); 
-                        }
-            
-                    }
-            }
+//        for(tmp=-3 ;tmp<3;tmp++)
+//            {
+//                for(temp=-3;temp<3;temp++)
+//                    {
+//                        if(temp==-3 || tmp ==-3 || temp == 2)
+//                        { 
+//                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(55*tmp ,0,55*temp)});
+//                         AGENT.setVisable(pa); 
+//                        }
+//            
+//                    }
+//            }
     
 //            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(0 ,0,-100),buildingSize:new THREE.Vector3(600,10,100)});
 //            AGENT.setVisable(pa); 
             
-            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,-55)});
+//            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,-55)});
+//            AGENT.setVisable(pa); 
+//
+//            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,45)});
+//            AGENT.setVisable(pa);   
+//    
+            pa = AGENT.BuildingAgent.initialize();
             AGENT.setVisable(pa); 
 
-            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,45)});
-            AGENT.setVisable(pa);   
-    
     
             pa = AGENT.XRoadAgent.initialize();
+    AGENT.setVisable(pa); 
 //
 //    var pAgent = new RoadAgent({direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
 //    pAgent.setVisable(true);
