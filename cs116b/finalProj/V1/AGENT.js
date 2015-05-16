@@ -2,6 +2,9 @@
 /*jslint nomen: true */
 /*jslint vars: true */
 // disable jslint issue that I dont care about
+//Code by Oliver Kenneth Seet
+// daggath@gmail.com
+// 408-849-5645
 var AGENT =
 	{
 		REVISION : '0.1'
@@ -850,8 +853,8 @@ AGENT.BuildingAgent.tryMakeBuilding = function (parameters)
                             }
                     }}
                 
-                console.log(parameters.collisionList);
-                console.log(temp);
+                if(debugModeOn)console.log(parameters.collisionList);
+                if(debugModeOn)console.log(temp);
                 if(debugModeOn)console.log("++++++++++++++");
                   
             // console.log(parameters.buildingSize.x + ":"+parameters.buildingSize.y  + ":"+parameters.buildingSize.z + ":");
@@ -897,7 +900,7 @@ AGENT.XRoadAgent.initialize = function(parameters)
 		{
 			type : "XRoadAgent"   
 		};
-	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 0.1, 50); // minimum size
+	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 2, 50); // minimum size
 	parameters.geometry = parameters.geometry || new THREE.CylinderGeometry(20, 20, 2,16);
     parameters.material = parameters.material || AGENT.Materials[7];
 	parameters.portals = [];  
@@ -1002,8 +1005,9 @@ AGENT.RoadAgent.initialize = function(parameters)
 		{
 			type : "RoadAgent" 
 		};
-	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 0.1, 50); // minimum size
-
+	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 0.1, 1); // minimum size
+    parameters.spawnCountdown = parameters.spawnCountdown || 50; // to ignore the origin buildings
+    parameters.maxSegLength = parameters.maxSegLength || 10000;
 	parameters.portals =
 		[];
 	parameters.residents =
@@ -1017,6 +1021,7 @@ AGENT.RoadAgent.initialize = function(parameters)
 	parameters.roadWidth = parameters.laneCount *  parameters.laneWidth;
 	parameters.roadHeight = Math.log( parameters.laneCount *  parameters.laneWidth);
 	parameters.roadLength = 500;
+    parameters.buildingSize.z = 1;
 	parameters.geometry = parameters.geometry || new THREE.BoxGeometry(parameters.roadWidth, parameters.roadHeight / 10, parameters.roadLength);
     parameters.roadGrowRate = parameters.roadGrowRate || 1; 
 	parameters.move = parameters.move || parameters.position;
@@ -1034,13 +1039,59 @@ AGENT.RoadAgent.initialize = function(parameters)
 };
 AGENT.RoadAgent.update = function(parameters)
 {
-    if(parameters.roadGrowRate !==undefined)
+    if(parameters.gogoRoad===undefined)
+        {parameters.gogoRoad = true;}
+    
+    if(parameters.roadGrowRate !==undefined && parameters.spawnCountdown<1)
         { 
-            parameters.buildingSize.add(new THREE.Vector3(0, 0, parameters.roadGrowRate)); 
-            parameters.innerMesh.geometry = new THREE.BoxGeometry(parameters.roadWidth, parameters.roadHeight / 10,parameters.buildingSize.z); 
-            AGENT.RealAgent.resetInnerMeshOffset(parameters);   
-             
-		}
-      
-};
+            //check end for any buildings
+            
+            if(parameters.spawnCountdown>0)
+            {     
+                parameters.rays = [parameters.direction];
+                parameters.rayDistances = [6]; 
+                temp = {outerObject:{position:new THREE.Vector3(parameters.innerMesh.position.x*2,0,parameters.innerMesh.position.z*2).add(parameters.outerObject.position)},rays:parameters.rays,rayDistances:parameters.rayDistances}
+                AGENT.RealAgent.collisionRaw(temp);
+                if(temp.collisionList[0].length>0)
+                    {
+                        parameters.gogoRoad = false;
+                    }
+            }
+
+            if(parameters.maxSegLength<0)
+                {
+                    parameters.gogoRoad = false;
+                }
+            else
+                {
+                    parameters.maxSegLength=parameters.maxSegLength-1;
+                }
+            
+//            scene.updateMatrixWorld();
+//            parameters.innerMesh.geometry.computeBoundingBox();
+//            var vector = new THREE.Vector3();
+//            vector.setFromMatrixPosition( parameters.innerMesh.matrixWorld );
+////            var aa = new THREE.Vector3(vector.x,0,0 ).add(vector) ;
+//            var eraseMe,bb = new THREE.SphereGeometry(3,32,32);
+//            
+//            if(Math.random()<0.2)
+//            {eraseMe = new THREE.Mesh(bb,AGENT.Materials[0]);
+//            eraseMe.translateX(vector.x    );
+//            eraseMe.translateY(vector.y);
+//            eraseMe.translateZ(vector.z );
+//            scene.add(eraseMe);}
+ 
+        
+        };
+        if(parameters.spawnCountdown>0)
+            {
+                parameters.spawnCountdown=parameters.spawnCountdown-1;             
+            }
+        if(parameters.gogoRoad)
+            {             
+                parameters.buildingSize.add(new THREE.Vector3(0, 0, parameters.roadGrowRate)); 
+                parameters.innerMesh.geometry = new THREE.BoxGeometry(parameters.roadWidth, parameters.roadHeight / 10,parameters.buildingSize.z); 
+                AGENT.RealAgent.resetInnerMeshOffset(parameters);   
+            }
+}
 

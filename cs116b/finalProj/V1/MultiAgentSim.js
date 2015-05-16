@@ -2,12 +2,15 @@
 /*jslint nomen: true */
 /*jslint vars: true */
 // disable jslint issue that I dont care about
+
+var debugModeOn = false; // turns on console messages and gridhelper
+
+
 var floorHeight = 1000;
 var speed = 100000;
 var cameraX= 0.0;
-var cameraY=100;
-var cameraZ= 0.0;
-var debugModeOn = true;
+var cameraY=1000;
+var cameraZ= 1000.0;
 var minBuildingSize;
 
 
@@ -89,7 +92,7 @@ function cameraInit(){
      initializeAgents();
  //    runTest();
         
-     initializeHelper();
+if(debugModeOn)initializeHelper();
      
      renderer = new THREE.WebGLRenderer();
      renderer.setPixelRatio(window.devicePixelRatio);
@@ -137,6 +140,12 @@ function initializeHelper(){
 };
 function initializeAgents(){ 
         var pa,temp,tmp;
+    
+    
+
+    pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(100,0,100)}); 
+    AGENT.setVisable(pa); 
+    
 //    for(  temp = 0;temp<10;temp++)
 //        {  
 //            pa = AGENT.PersonAgent.initialize(
@@ -174,8 +183,8 @@ function initializeAgents(){
 //                    }
     
     
-            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(0 ,0,-100),buildingSize:new THREE.Vector3(600,10,100)});
-            AGENT.setVisable(pa); 
+//            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(0 ,0,-100),buildingSize:new THREE.Vector3(600,10,100)});
+//            AGENT.setVisable(pa); 
             
 //            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,-55)});
 //            AGENT.setVisable(pa); 
@@ -196,8 +205,9 @@ function initializeAgents(){
 //    pa =AGENT.RoadAgent.initialize({spinY:degreeToRadian(0),direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
 //    AGENT.setVisable(pa);
 //    
-//   var pAgent2 = new RoadAgent({direction: new THREE.Vector3(0,0,0),  position : new THREE.Vector3( 0,0,0)});
-//      pAgent2.setVisable(true);
+
+    pa = AGENT.BuildingAgent.initialize();
+    AGENT.setVisable(pa); 
 
 }
 function runTest(){
