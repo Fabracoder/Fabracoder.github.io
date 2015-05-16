@@ -3,7 +3,7 @@
 /*jslint vars: true */
 // disable jslint issue that I dont care about
 var floorHeight = 1000;
-var speed = 10000;
+var speed = 100000;
 var cameraX= 0.0;
 var cameraY=100;
 var cameraZ= 0.0;
@@ -179,7 +179,7 @@ function initializeAgents(){
 //            pa = AGENT.BuildingAgent.initialize();
 //            AGENT.setVisable(pa); 
 
-            pa = AGENT.RoadAgent.initialize({spinY:10});
+            pa = AGENT.RoadAgent.initialize({spinY:10,position: new THREE.Vector3(0,0,0)});
             AGENT.setVisable(pa); 
     
             pa = AGENT.XRoadAgent.initialize();

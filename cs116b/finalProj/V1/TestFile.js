@@ -39,8 +39,8 @@ var CreateTerrain = function(parameters) // x,y location , world seed, size of p
     customTerra.rotateZ(degreeToRadian(90));
      var centerPosition = {x:0,y:0}; 
     
-//    var data = generateHeight2(subX,subY,{x:0,y:0},1422,100);
-    var data = generateHeight3(subX,subY,{x:0,y:0},1,5,100,{boxX,boxY});
+    var data = generateHeight(subX,subY,{x:0,y:0},1422,100);
+//    var data = generateHeight3(subX,subY,{x:0,y:0},1,5,100,{boxX,boxY});
     
 //    var data = generateHeight(subX,subY,{x:0,y:0},13,100);
     

@@ -181,6 +181,16 @@ AGENT.setVisable = function(parameters)
 			normalScale : new THREE.Vector2(0.85, 0.85)
 
 		}));
+    
+    var t = THREE.ImageUtils.loadTexture( 'Resources/final_textures/road2.png' );
+     t.wrapS = THREE.RepeatWrapping;
+	window.AGENT.Materials.push(new THREE.MeshPhongMaterial(
+		{
+			specular : 0x331111,
+			shininess : 15,
+			map : THREE.ImageUtils.loadTexture(t) 
+
+		}));    
     AGENT.updateActiveBuildings();
 
 }());
@@ -820,11 +830,11 @@ AGENT.XRoadAgent.initialize = function(parameters)
     
  	parameters = parameters ||
 		{
-			type : "XRoadAgent",
-			material : AGENT.Materials[4]
+			type : "XRoadAgent"  
 		};
 	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 0.1, 50); // minimum size
 	parameters.geometry = parameters.geometry || new THREE.CylinderGeometry(20, 20, 2,16);
+    parameters.material = parameters.material || AGENT.Materials[6];
 	parameters.portals = [];  
 	parameters.agentUpdate = AGENT.XRoadAgent.update;
     parameters.resetOrigin = true; 
@@ -844,6 +854,9 @@ AGENT.XRoadAgent.initialize = function(parameters)
 		}); 
 	return parameters;   
     
+    /////////////////////////////////
+    
+    
     
     
 };
@@ -854,27 +867,28 @@ AGENT.RoadAgent = function(parameters)
 };
 
 AGENT.RoadAgent.initialize = function(parameters)
-{
-    'use strict';
+{ 
 	parameters = parameters ||
 		{
-			type : "RoadAgent",
-			material : AGENT.Materials[2]
+			type : "RoadAgent" 
 		};
 	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 0.1, 50); // minimum size
-	parameters.geometry = parameters.geometry || new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z);
+
 	parameters.portals =
 		[];
 	parameters.residents =
 		[];
-	parameters.maxResidents = parameters.maxResidents || 2;
+    parameters.material = parameters.material || AGENT.Materials[6]; 
 	parameters.agentUpdate = AGENT.RoadAgent.update;
-	// parameters = AGENT.updateParams(parameters,
-	// {
-	// type : 'BuildingAgent',
-	// material : AGENT.Materials[4]//new THREE.MeshBasicMaterial({color :
-	// 0x2f1a70})
-	// });
+    parameters.laneCount =  parameters.laneCount || 1;
+    parameters.laneWidth = parameters.laneWidth ||10;
+    parameters.direction = parameters.direction || AGENT.getRND_V3_010();
+    
+	parameters.roadWidth = parameters.laneCount *  parameters.laneWidth;
+	parameters.roadHeight = Math.log( parameters.laneCount *  parameters.laneWidth);
+	parameters.roadLength = 500;
+	parameters.geometry = parameters.geometry || new THREE.BoxGeometry(parameters.roadWidth, parameters.roadHeight / 10, parameters.roadLength);
+    parameters.roadGrowRate = parameters.roadGrowRate || 1; 
 	parameters.move = parameters.move || parameters.position;
 	
     AGENT.RealAgent.initialize(parameters);
@@ -883,9 +897,16 @@ AGENT.RoadAgent.initialize = function(parameters)
 			name : 'RoadAgent:' + parameters.uuid,
             type : 'RoadAgent'  
 		}); 
-	return parameters;
+	return parameters; 
 };
 AGENT.RoadAgent.update = function(parameters)
 {
-    
+    if(parameters.roadGrowRate !==undefined)
+        { 
+            parameters.buildingSize.add(new THREE.Vector3(0, 0, parameters.roadGrowRate)); 
+            parameters.innerMesh.geometry = new THREE.BoxGeometry(parameters.roadWidth, parameters.roadHeight / 10,parameters.buildingSize.z); 
+            AGENT.RealAgent.resetInnerMeshOffset(parameters);   
+             
+		}
+      
 };
