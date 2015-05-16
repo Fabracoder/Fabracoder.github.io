@@ -7,7 +7,7 @@ var speed = 100000;
 var cameraX= 0.0;
 var cameraY=100;
 var cameraZ= 0.0;
-
+var debugModeOn = true;
 var minBuildingSize;
 
 
@@ -164,17 +164,18 @@ function initializeAgents(){
 //                        } 
 //                    }
 //            }
-    for(temp=-3;temp<3;temp++)
-                    { 
-                        { 
-                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(155*tmp +1000 ,0,155*temp)});
-                         AGENT.setVisable(pa); 
-                        } 
-                    }
+    
+//    for(temp=-3;temp<3;temp++)
+//                    { 
+//                        { 
+//                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(155*tmp +1000 ,0,155*temp)});
+//                         AGENT.setVisable(pa); 
+//                        } 
+//                    }
     
     
-//            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(0 ,0,-100),buildingSize:new THREE.Vector3(600,10,100)});
-//            AGENT.setVisable(pa); 
+            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(0 ,0,-100),buildingSize:new THREE.Vector3(600,10,100)});
+            AGENT.setVisable(pa); 
             
 //            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(150,0,-55)});
 //            AGENT.setVisable(pa); 
