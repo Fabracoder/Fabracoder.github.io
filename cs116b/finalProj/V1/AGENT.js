@@ -175,8 +175,8 @@ AGENT.setVisable = function(parameters)
 		{
 			specular : 0xaa3333,
 			shininess : 15,
-			map : THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048.jpg"),
-			specularMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea_specular_2048.jpg"),
+			map : THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048.png"),
+			specularMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048_BW.jpg"),
 			normalMap : THREE.ImageUtils.loadTexture("Resources/final_textures/ea_normal_2048.jpg"),
 			normalScale : new THREE.Vector2(0.85, 0.85)
 
@@ -191,6 +191,8 @@ AGENT.setVisable = function(parameters)
 			map : THREE.ImageUtils.loadTexture(t) 
 
 		}));    
+    
+    window.AGENT.Materials.push( new THREE.MeshLambertMaterial({color: 0x0000ff, transparent: true, opacity: 0.13}));
     AGENT.updateActiveBuildings();
 
 }());
@@ -646,8 +648,65 @@ AGENT.BuildingAgent.initialize = function(parameters)
 			name : 'BuildingAgent:' + parameters.uuid,
             type : 'BuildingAgent'  
 		}); 
+    
+    // make front door Xroad
+    
+    var temp =Math.random();
+    if(temp>0.75)
+        {
+                temp= AGENT.XRoadAgent.initialize({position:new THREE.Vector3(0,0,20).add(parameters.outerObject.position)});
+                AGENT.setVisable(temp);
+        }
+    else if(temp>0.50)
+        {
+                temp= AGENT.XRoadAgent.initialize({position:new THREE.Vector3(0,0, - (parameters.buildingSize.z +20) ).add(parameters.outerObject.position)});
+                AGENT.setVisable(temp);
+        }
+    else if(temp>0.25)
+        {
+                temp= AGENT.XRoadAgent.initialize(
+                    {position:new THREE.Vector3(parameters.buildingSize.x/2 +20,0,-parameters.buildingSize.z/2).add(parameters.outerObject.position)});
+                AGENT.setVisable(temp);
+        }
+    else  
+        {
+                temp= AGENT.XRoadAgent.initialize(
+                    {position:new THREE.Vector3(-parameters.buildingSize.x/2 -20,0,-parameters.buildingSize.z/2).add(parameters.outerObject.position)});
+                AGENT.setVisable(temp);
+        }
+    
+    
+    
+    
 	return parameters;
 };
+
+AGENT.BuildingAgent.testSide = function(parameters,direction,extraDistance,buildingDistance) 
+{// used for Xroad placement testing and for building growth
+    
+    var i=0,result;
+    parameters.rays = [];
+    parameters.rayDistances = [];
+    for(i=0;i<buildingDistance/10;i=i+1)
+        {
+            parameters.rays.push(new THREE.Vector3(0,0,-i*5).add(direction));
+            parameters.rays.push(new THREE.Vector3(0,0,i*5).add(direction));
+            parameters.rayDistances.push(extraDistance);
+            parameters.rayDistances.push(extraDistance);
+        }
+    
+
+    AGENT.RealAgent.collisionRaw(parameters,2);
+    result = true;
+    for(i=0;i<parameters.collisionList.length;i=i+1)
+    {
+        if(parameters.collisionList[i].length !== 0    )
+        { result = false;}
+    }
+   
+    return result;
+};
+
 
 AGENT.BuildingAgent.update = function(parameters)
 {
@@ -656,7 +715,7 @@ AGENT.BuildingAgent.update = function(parameters)
 	if (parameters.residents.length > parameters.maxResidents)
 	{
         console.log("BuildingGrowing:"+parameters.name);
-		if (temp > 0.1)
+		if (temp > 0.5)
 		{
             // add a floor
 			parameters.buildingSize.add(new THREE.Vector3(0, 10, 0));
@@ -665,11 +724,13 @@ AGENT.BuildingAgent.update = function(parameters)
 		{
 			if (temp < 0.05)
 			{
-				parameters.buildingSize.add(new THREE.Vector3(10, 0, 0));
+                if(AGENT.BuildingAgent.testSide(parameters,AGENT.RealAgent.rays[2],parameters.buildingSize.x+11,parameters.buildingSize.x))
+                    {parameters.buildingSize.add(new THREE.Vector3(10, 0, 0));}
 			}// grow
 			else
 			{
-				parameters.buildingSize.add(new THREE.Vector3(0, 0, 10));
+                if(AGENT.BuildingAgent.testSide(parameters,AGENT.RealAgent.rays[0],parameters.buildingSize.z+11,parameters.buildingSize.z))
+				    {parameters.buildingSize.add(new THREE.Vector3(0, 0, 10));}
 			}// grow
 		}
 		parameters.innerMesh.geometry = new THREE.BoxGeometry(parameters.buildingSize.x, parameters.buildingSize.y, parameters.buildingSize.z, 5, 5, 5); 
@@ -828,13 +889,13 @@ AGENT.XRoadAgent.initialize = function(parameters)
 //   new CylinderGeometry(20, 20, height, 2);
     
     
- 	parameters = parameters ||
+    parameters = parameters ||
 		{
-			type : "XRoadAgent"  
+			type : "XRoadAgent"   
 		};
 	parameters.buildingSize = parameters.buildingSize || new THREE.Vector3(10, 0.1, 50); // minimum size
 	parameters.geometry = parameters.geometry || new THREE.CylinderGeometry(20, 20, 2,16);
-    parameters.material = parameters.material || AGENT.Materials[6];
+    parameters.material = parameters.material || AGENT.Materials[7];
 	parameters.portals = [];  
 	parameters.agentUpdate = AGENT.XRoadAgent.update;
     parameters.resetOrigin = true; 
@@ -853,12 +914,77 @@ AGENT.XRoadAgent.initialize = function(parameters)
             type : 'XRoadAgent'  
 		}); 
 	return parameters;   
-    
-    /////////////////////////////////
-    
-    
-    
-    
+      
+};
+
+AGENT.XRoadAgent.update = function (parameters)
+{ 
+    // if has another Xroad in direct gridSight it creates a road in that direction
+    // otherwise it is random out of up/down/left/right
+    // as road grows it checks to see if it has another Xroad in sight.perpendicular to the road
+    //  if so, create a road in that direction
+
+    var list =[]; 
+    if(parameters.portals.length >0)
+    {
+        
+    }
+    else
+    {
+            parameters.rays = [AGENT.RealAgent.rays[0],AGENT.RealAgent.rays[2],AGENT.RealAgent.rays[4],AGENT.RealAgent.rays[6]]; 
+            parameters.rayDistances = [5000,5000,5000,5000];
+            AGENT.RealAgent.collisionRaw(parameters,0);
+
+        // (0, 0, 1),  (1, 0, 0),   (0, 0, -1), (-1, 0, 0) 
+        if(parameters.collisionList[0]>0)    
+        {
+            list.push('west'); 
+        }
+        if(parameters.collisionList[1]>0)    
+        {
+            list.push('north'); 
+        }
+        if(parameters.collisionList[2]>0)    
+        {
+            list.push('east'); 
+        }
+        if(parameters.collisionList[3]>0)    
+        {
+            list.push ('south'); 
+        }
+            
+        list = list[((Math.random()*100)%list.length)];
+        switch(list)
+            {
+                case 'west':
+                    list =  180;
+                    break;
+                    
+                case 'north':
+
+                    list =  90;
+                    
+                    break;
+                    
+                case 'east':
+                    list =  0;
+                    break;
+                      
+                case 'south':
+                    list =  -90;
+                    break;
+
+                default:
+                    THREE.warn("Unreachable code reached: XRoad, switch : 0ghw0");
+                    list =0;
+                    break;
+                                        
+            }
+        list = AGENT.RoadAgent();
+        AGENT.setVisable(list);
+        
+    }
+
 };
 
 AGENT.RoadAgent = function(parameters)

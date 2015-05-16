@@ -28,9 +28,9 @@ var minPlotSize =50;
 
          specular: 0x333333,
          shininess: 15,
-         map: THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048.jpg"),
-         specularMap: THREE.ImageUtils.loadTexture("Resources/final_textures/ea_specular_2048.jpg"),
-         normalMap: THREE.ImageUtils.loadTexture("Resources/final_textures/ea_normal_2048.jpg"),
+         map: THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048.png"),
+         specularMap: THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048_BW.png"),
+         normalMap: THREE.ImageUtils.loadTexture("Resources/final_textures/ea2048_N.png"),
          normalScale: new THREE.Vector2(0.85, 0.85)
 
      });
@@ -157,14 +157,21 @@ function initializeAgents(){
 //            {
 //                for(temp=-3;temp<3;temp++)
 //                    {
-//                        if(temp==-3 || tmp ==-3 || temp == 2)
+//                        if(temp==-3 || tmp ==-3 || temp == 2 || tmp == 2)
 //                        { 
 //                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(55*tmp ,0,55*temp)});
 //                         AGENT.setVisable(pa); 
-//                        }
-//            
+//                        } 
 //                    }
 //            }
+    for(temp=-3;temp<3;temp++)
+                    { 
+                        { 
+                         pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(155*tmp +1000 ,0,155*temp)});
+                         AGENT.setVisable(pa); 
+                        } 
+                    }
+    
     
 //            pa = AGENT.BuildingAgent.initialize({position:new THREE.Vector3(0 ,0,-100),buildingSize:new THREE.Vector3(600,10,100)});
 //            AGENT.setVisable(pa); 
@@ -179,14 +186,14 @@ function initializeAgents(){
 //            pa = AGENT.BuildingAgent.initialize();
 //            AGENT.setVisable(pa); 
 
-            pa = AGENT.RoadAgent.initialize({spinY:10,position: new THREE.Vector3(0,0,0)});
-            AGENT.setVisable(pa); 
-    
-            pa = AGENT.XRoadAgent.initialize();
-            AGENT.setVisable(pa); 
-//
-    pa =AGENT.RoadAgent.initialize({direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
-    AGENT.setVisable(pa);
+//            pa = AGENT.RoadAgent.initialize({spinY:degreeToRadian(-90),position: new THREE.Vector3(0,0,0)});
+//            AGENT.setVisable(pa); 
+//    
+//            pa = AGENT.XRoadAgent.initialize();
+//            AGENT.setVisable(pa); 
+////
+//    pa =AGENT.RoadAgent.initialize({spinY:degreeToRadian(0),direction: new THREE.Vector3(0,1,0),  position : new THREE.Vector3(0,0,0)});
+//    AGENT.setVisable(pa);
 //    
 //   var pAgent2 = new RoadAgent({direction: new THREE.Vector3(0,0,0),  position : new THREE.Vector3( 0,0,0)});
 //      pAgent2.setVisable(true);
@@ -232,7 +239,7 @@ function degreeToRadian(value)
 
      controls.movementSpeed = speed * (delta);
      controls.update(delta);
- 
+      
      for(var k =0 ;k<AGENT.AgentPList.length;k++)
          { 
              AGENT.AgentPList[k].agentUpdate(AGENT.AgentPList[k]);
