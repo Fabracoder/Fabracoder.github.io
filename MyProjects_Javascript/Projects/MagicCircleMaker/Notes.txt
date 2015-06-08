@@ -1,0 +1,95 @@
+Magic Circle Analysis
+
+Writing along a path/line
+Writing as a path/line
+Writing between a path/line
+
+X-Axis Symmetry
+     Regular Polygons
+
+Circles
+
+
+Layers?
+
+---------------------
+
+
+Given any point of interest you can create X-Axis Symmetry
+    0 = invisable
+    1 = Circle
+    2 = (line) Mirror
+    3 = Triangle
+    4 = Square
+Any Path can be replaced with a symbol chain
+Any Path can be replaced with a symbol chain next to it ( on either or both sides )
+Any Path can be replaced with a symbol chain (between two new paths)
+ 
+Point 
+    [Properties: LocDef]
+    (center point of screen is provided if there is none, all other points come form path intersections)
+
+Line
+    [Properties: LocDef[],Distance, Rotation, Side# % PolySize]
+    (Line Segment in reality. You can speficy visability for any line segment displayed from regular polygon)
+    (Distance refers to the length of the line, it is attached at the centerpoint to LocDef if LocDef only has 1 point)
+
+Any point can generate a X-Axis Symmetry layer
+   
+    Anything can be placed with a given distance and angle provided
+    (if no angle is provided then it defaults to 0, simularly 0 for distance)
+
+
+X-Axis Symmetry layer
+    Distance
+    Symmetry #
+    Opacity Within layer (border lines are )
+    Layer Precidence #
+
+Rotation:
+    degrees Relative (to parent)
+    degrees Relative (to other point)
+    degrees Absolute 
+    Point At (other Point, degrees)
+    
+
+Issue
+    Interweaved (think celtic knots)
+        Resolution?
+                each intersection point can have an override on layer precidence
+
+
+Future Features
+3D! 
+ND!
+Color
+    Any path segment can have it's own color modifier.
+        Absolute
+        Relative
+
+Import image   
+Symbol // preferably vector image but other images can be imported as well
+    [Properties: Size(LocDef,Imported File Image Location,bounding area]
+
+Curve
+    Defined by equation
+
+Animation
+    (interpolating from keyframes)
+    (Recorded creation process)
+    (Logical Creation Process)
+ 
+Writing along a path/line
+Writing as a path/line
+Writing between a path/line
+ 
+ 
+ Special effects : 
+    Glow
+    Directional Blur
+    
+    
+    
+
+
+
