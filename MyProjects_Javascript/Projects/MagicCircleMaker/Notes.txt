@@ -93,3 +93,21 @@ Writing between a path/line
 
 
 
+======================
+
+
+Fractal 
+ Components
+    Land ( usually used as farm land ) [ resource precurement : wood[forest, other], food[orchards, fields, etc], earth[stone,metal, etc]]
+    wall
+    Tower
+    Castle
+    Star Fortress
+    
+
+Terrain height, water distribution
+
+origin: = highest tile
+    
+sym 1
+sym 2
