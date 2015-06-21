@@ -9,9 +9,10 @@
 <body>
 	<div id="Ax"></div>
 <script>
-	var draw = svg('Ax').size(1000, 1000)
-    var rect = draw.rect(150, 100).attr({ fill: '#f06' , x:100,y:100})
-    
+	var draw = svg('Ax').size(1000, 1000);
+    var rect = draw.rect(150, 100).attr({ fill: '#f06' , x:100,y:100});
+    var cir = draw.ellipse(200,200,100,100).attr({ fill: '#faa026' , x:100,y:200});
+        
     //	rect.animate().move(190, 190)
 </script>
 </body>
